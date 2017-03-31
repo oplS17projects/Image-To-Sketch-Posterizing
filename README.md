@@ -1,14 +1,3 @@
-
-# Archivement:
-
-We sucess full to convert from normal Image to the Grey Image.
-
-# Image:
-![Screenshot](test.png) 
-
-# Output
-![Screenshot](Output_test.png) 
-
 # Image-To-Cartoon
 
 ### Statement
