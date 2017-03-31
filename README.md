@@ -1,23 +1,26 @@
-# FP4-proposal
+# Image-To-Cartoon
+# Team Member: Duy Truong & Chuong Vu
+# Version : 0.1
 
-**do not fork this** there are different directions
+# Introduce:
 
-## tl;dr
+In this project, we plan to implementing a application which can help user can load the image and convert it into different Style.
 
-1. Create a repository in [our organization][oplorg] for your project; add your teammate(s) as collaborators
-2. Copy-paste this [template file](template.md) as the `README.md` file in your new repo; edit to become project plan
-3. Make 3-slide slide show to be presented in class; insert into [class desk][gslides]
-4. Enter project details into a new [Google form][projform]
-5. Make a 0.1 release of your project (tagging `@fgmart`)
+# Algorithm:
 
-## Due Date
-* Sun Apr 2, 2017 at 11p
+A Image is contributed by milions pixel values. We load every single pixel value which are RGB values. We change the value of RGB
+It will help user can convert the image to different type of image (Cartoon, sketch).
 
-## Instructions
+# Archivement:
 
-Teams will submit a single proposal, with sections that each member has done individually detailing their proposed contributions. The submission will be the `README.md` file in your brand-new project repository, which you'll make. 
+We sucess full to convert from normal Image to the Grey Image.
 
-You must start using GitHub collaboratively from this point forward. 
+# Image:
+![Screenshot](test.png) 
+
+# Output
+![Screenshot](Output_test.png) 
+
 
 Instructions: 
 
