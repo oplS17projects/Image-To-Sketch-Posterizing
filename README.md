@@ -72,4 +72,4 @@ will write function to read and store the function to the list.
 * Merge the data from 2D list into single List
 
 ### Chuong Vu @ChuongVu
-will work on edit the value of RGB
+Work on mapping RGB value and change the value based on need
