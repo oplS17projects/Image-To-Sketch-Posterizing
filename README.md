@@ -61,11 +61,10 @@ Please use Github properly: each individual must make the edits to this file rep
 
 In the headings below, replace the silly names and GitHub handles with your actual ones.
 
-### Susan Scheme @susanscheme
-will write the....
+### Duy Truong @Duytruong
+will write function to read and store the function to the list. 
+* Store the data into 2D list
+* Merge the data from 2D list into single List
 
-### Leonard Lambda @lennylambda
-will work on...
-
-### Frank Funktions @frankiefunk 
-Frank is team lead. Additionally, Frank will work on...   
+### Chuong Vu @ChuongVu
+will work on edit the value of RGB
