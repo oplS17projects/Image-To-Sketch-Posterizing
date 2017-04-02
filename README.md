@@ -24,9 +24,14 @@ How will you know if you are successful?
 If you include some kind of _quantitative analysis,_ that would be good.
 
 ## Architecture Diagram
-Upload the architecture diagram you made for your slide presentation to your repository, and include it in-line here.
 
-Create several paragraphs of narrative to explain the pieces and how they interoperate.
+![Screenshot](Output_test.png) 
+
+1. Load the Input image
+2. Read every pixel of the Image which are the RGB value and store it into 2D list.
+3. Using the algorithm co calculate and change the RGB data into the new 2D list.
+4. To Draw it in to new picture, we need to merge it from 2D list into one list.
+
 
 ## Schedule
 Explain how you will go from proposal to finished product. 
