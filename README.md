@@ -1,5 +1,7 @@
 # Image-To-Cartoon
 
+### Version : 0.1
+
 ### Statement
 
 In this project, we plan to implementing a application which can help user can load the image and convert it into different Style.
