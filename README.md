@@ -4,74 +4,68 @@
 
 ### Statement
 
-In this project, we plan to implementing a application which can help user can load the image and convert it into different Style.
-We hope to learn a algorithms to convert from normal image to cartoon or sketch image.
+Our project is simply convert an image to cartoon/stretch image. We plans implement an application that allow users convert any image that they wanted into a difference style.
 
 ### Analysis
-A Image is contributed by milions pixel values. We load every single pixel value which are RGB values. We change the value of RGB
-It will help user can convert the image to different type of image (Cartoon, sketch).
+An digital image is a contributed by millions pixel/dot. And each pixel is contain 3 values Reg/Green/Blue (RGB) and these value make a color. Our program is load every pixel (RGB) into a list of list (or we can say 2-dimension array or matrix x/y). The pixel in the matrix is represent each dot on the image so it help us easily keep track the color at the position x/y. By that, we can can change the color to anything we want and for this project, our goal it convert the image to cartoon/stretch image.
+
 
 ### Deliverable and Demonstration
-We sucess full to convert from normal Image to the Grey Image.
+We successfully converted color image to the Black-and-White (BW) image.
 
-# Image:
-![Screenshot](test.png) 
 
-# Output
-![Screenshot](Output_test.png) 
-
+## Image:
+![alt text][output]
 
 ### Evaluation of Results
-How will you know if you are successful? 
-If you include some kind of _quantitative analysis,_ that would be good.
+We are almost there, we are now searching for a good algorithm that do a filter, which it use to combine this filter and BW to create a new image.
+
+* The BW image is very simple, it is made from gray value and gray value is the mean of RGB values.
+* Filter, we are searching for a good algorithm now. There are many image’s filter such as Median Blur, Bilateral filter, Min filter. 
+
+We may use Median Blur and redraw the image based on detect and enhance edges algorithm to create a new image.
+
 
 ## Architecture Diagram
 
-![Screenshot](Diagram.png) 
+![alt text][diagram]
 
 1. Load the Input image
 2. Read every pixel of the Image which are the RGB value and store it into 2D list.
-3. Using the algorithm co calculate and change the RGB data into the new 2D list.
-4. To Draw it in to new picture, we need to merge it from 2D list into one list.
+3. Calculate gray values
+4. Create filter
+5. Combine gray values and filter
+6. Create new image 
 
 
 ## Schedule
-Explain how you will go from proposal to finished product. 
-
-There are three deliverable milestones to explicitly define, below.
-
-The nature of deliverables depend on your project, but may include things like processed data ready for import, core algorithms implemented, interface design prototyped, etc. 
-
-You will be expected to turn in code, documentation, and data (as appropriate) at each of these stages.
-
-Write concrete steps for your schedule to move from concept to working system. 
 
 ### First Milestone (Sun Apr 9)
-Which portion of the work will be completed (and committed to Github) by this day? 
+Work on the filter for the image (Which is the most heaviest thing for the project).
 
 ### Second Milestone (Sun Apr 16)
-Which portion of the work will be completed (and committed to Github) by this day?  
+Finished the filter and combine everything together.
 
 ### Public Presentation (Mon Apr 24, Wed Apr 26, or Fri Apr 28 [your date to be determined later])
-What additionally will be completed before the public presentation?
+Wrap up everything, all bugs should be addressed.
 
 ## Group Responsibilities
-Here each group member gets a section where they, as an individual, detail what they are responsible for in this project. Each group member writes their own Responsibility section. Include the milestones and final deliverable.
 
-Please use Github properly: each individual must make the edits to this file representing their own section of work.
-
-**Additional instructions for teams of three:** 
-* Remember that you must have prior written permission to work in groups of three (specifically, an approved `FP3` team declaration submission).
-* The team must nominate a lead. This person is primarily responsible for code integration. This work may be shared, but the team lead has default responsibility.
-* The team lead has full partner implementation responsibilities also.
-* Identify who is team lead.
-
-In the headings below, replace the silly names and GitHub handles with your actual ones.
-
-### Duy Truong @Duytruong
-will write function to read and store the function to the list. 
-* Store the data into 2D list
+### Duy Truong @duytruong92
+Main: Clean up, QA for program
+* Read RGB into 2D list 
 * Merge the data from 2D list into single List
+* Merge gray and filter to 2D list
+* Work on filter
 
-### Chuong Vu @ChuongVu
-Work on mapping RGB value and change the value based on need
+### Chuong Vu @vdc1703
+Main: Gather information needed for the project.
+* Convert and store the changeable RGB into 2D list
+* Calculate gray values into new 2D list
+* Work on filter
+* Convert new 2D list to a new image
+
+
+<!-- Links -->
+[output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/OutPut.PNG
+[diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png
