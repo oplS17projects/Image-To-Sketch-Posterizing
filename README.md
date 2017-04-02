@@ -25,7 +25,7 @@ If you include some kind of _quantitative analysis,_ that would be good.
 
 ## Architecture Diagram
 
-![Screenshot](Output_test.png) 
+![Screenshot](Diagram.png) 
 
 1. Load the Input image
 2. Read every pixel of the Image which are the RGB value and store it into 2D list.
