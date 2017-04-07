@@ -1,4 +1,4 @@
-# Image-To-Cartoon
+# Posterizing
 
 ### Version: 0.2
 
