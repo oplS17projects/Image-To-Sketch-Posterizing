@@ -41,10 +41,11 @@ We may use Median Blur and redraw the image based on detect and enhance edges al
 ## Schedule
 
 ### First Milestone (Sun Apr 9)
-# Duy Truong:
+
+Duy Truong:
 * Finished Posterizing Filter
 
-#Chuong Vu:
+Chuong Vu:
 * Finished InvertColor Filter
 
 We both will work on Gaussian Blur Filter. After that we will combine the filter and gray filter togeter to get the final image.
