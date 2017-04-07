@@ -1,6 +1,6 @@
 # Image-To-Cartoon
 
-### Version : 0.1
+### Version: 0.2
 
 ### Statement
 
@@ -41,7 +41,13 @@ We may use Median Blur and redraw the image based on detect and enhance edges al
 ## Schedule
 
 ### First Milestone (Sun Apr 9)
-Work on the filter for the image (Which is the most heaviest thing for the project).
+# Duy Truong:
+* Finished Posterizing Filter
+
+#Chuong Vu:
+* Finished InvertColor Filter
+
+We both will work on Gaussian Blur Filter. After that we will combine the filter and gray filter togeter to get the final image.
 
 ### Second Milestone (Sun Apr 16)
 Finished the filter and combine everything together.

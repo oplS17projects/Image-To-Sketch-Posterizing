@@ -1,5 +1,5 @@
 #lang racket
-
+; Version 0.2
 ;(require (except-in racket/draw make-pen))
 ;(require (prefix-in htdp: 2htdp/image))
 ;; for bitmap
@@ -13,7 +13,7 @@
 ;(require picturing-programs)
 
 ;; read the image
-(define imgtest (bitmap "test.png"))
+(define imgtest (bitmap "model-9.jpg"))
 
 ;; get image height
 (define img-height (- (image-height imgtest) 1))
@@ -53,65 +53,220 @@
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
             (get-pixel x y))))
-    
+
+;; save to text file for test
+;;(define out (open-output-file "test.txt" #:exists 'replace))
+;;(write RGBList out)
+;;(close-output-port out)
+
+
+;; 1. Read the RGBList
 (define RGBList
   (RGBList-iter img-width img-height))
 
-;; save to text file for test
-(define out (open-output-file "test.txt" #:exists 'replace))
-(write RGBList out)
-(close-output-port out)
+
+;;==============================
+;; Duy
+;; Function for Posterize Algorithm
+
+(define (round-num num-ori num-int)
+  (if (< (- num-ori num-int) 0.5)
+      (floor num-ori)
+      (ceiling num-ori)))
+
+
+(define (posterize-point lst numOfArea numOfValues)
+  (local
+    [(define redAreaFloat (/ (list-ref lst 0) numOfArea))
+     (define redArea (round-num redAreaFloat (floor redAreaFloat)))
+     (define greenAreaFloat (/ (list-ref lst 1) numOfArea))
+     (define greenArea (round-num greenAreaFloat (floor greenAreaFloat)))
+     (define blueAreaFloat (/ (list-ref lst 2) numOfArea))
+     (define blueArea (round-num blueAreaFloat (floor blueAreaFloat)))
+     (define newredfloat 0.0)
+     (define newgreengfloat 0.0)
+     (define newbluefloat 0.0)
+     (define newred 0)
+     (define newgreen 0)
+     (define newblue 0)]
+    
+    (cond
+      [(> redArea redAreaFloat)(set! redArea (- redArea 1))])
+    (set! newredfloat (* numOfValues redArea))
+    (set! newred (round-num newredfloat (floor newredfloat)))
+    (cond
+      [(> newred newredfloat)(set! newred (- newred 1))])
+
+
+    (cond
+      [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
+    (set! newgreengfloat (* numOfValues greenArea))
+    (set! newgreen (round-num newgreengfloat (floor newgreengfloat)))
+    (cond
+      [(> newgreen newgreengfloat)(set! newgreen (- newgreen 1))])
+    
+    (cond
+      [(> blueArea blueAreaFloat)(set! blueArea (- blueArea 1))])
+    (set! newbluefloat (* numOfValues blueArea))
+    (set! newblue (round-num newbluefloat (floor newbluefloat)))
+    (cond
+      [(> newblue newbluefloat)(set! newblue (- newblue 1))])
+    (list newred newgreen newblue)
+    
+    ))
+   
+
+(define (posterize data width height value)
+  (cond [(and (>= value 2) (<= value 255))
+      (local
+        [(define numOfAreas (/ 256 value))
+         (define numOfValues (/ 255 (- value 1)))]
+        (for/list ([x (in-range 0 height)])
+          (for/list ([y (in-range 0 width)])
+            (posterize-point (list-ref (list-ref data x) y) numOfAreas numOfValues)
+      )))]))
+
 
 
 ;;==============================
-;;Create a gray list
+;; Create a gray list
 ;; This will be the based for any other method. The gray-point will be the final list before convert image
-(define (gray-point lst)
+;(define (gray-point lst)
+;  (local
+;    [(define gray (quotient (+ (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)) 3))]
+;    (make-color gray gray gray)))
+
+;(define (GrayList-iter width height)
+;  (for/list ([x (in-range 0 height)])
+;    (for/list ([y (in-range 0 width)])
+;      (gray-point (list-ref (list-ref RGBList x) y))
+;      )))
+
+
+;; ==============================
+;; This function is use for Posterizing Filter
+;; Create a gray list value
+
+(define (gray-point-value lst)
   (local
     [(define gray (quotient (+ (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)) 3))]
-    (make-color gray gray gray)))
-  
-(define (GrayList-iter width height)
+    (list gray gray gray)))
+
+(define (GrayList-iter-value width height)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
-      (gray-point (list-ref (list-ref RGBList x) y))
+      (gray-point-value (list-ref (list-ref RGBList x) y))
       )))
 
-(define GrayList
-  (GrayList-iter img-width img-height))
+(define MakeGrayList
+  (GrayList-iter-value img-width img-height))
+
+
+
 
 ;;==============================
 ;; Convert 2d list matrix to single list
-(define FinalList
-  (append* RGBList))
+;(define FinalList
+;  (append* RGBList))
     
 ;; save to text file for test
-(define out1 (open-output-file "list.txt" #:exists 'replace))
-(write FinalList out1)
-(close-output-port out1)
+;;(define out1 (open-output-file "list.txt" #:exists 'replace))
+;;(write FinalList out1)
+;;(close-output-port out1)
 
 ;;==============================
 ; Join list
-(define (join-list list-calculated count max result)
+
+;; Convert List to make-color object
+
+(define (lst-value lst)
+  (make-color (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)))
+  
+(define (MakeColorObjectList lstvalue width height)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+      (lst-value (list-ref (list-ref lstvalue x) y))
+      )))
+
+
+(define (join-list-next list-calculated count max result)
   (if (= count max)
       result
       (join-list list-calculated (+ count 1) max (append result (list-ref list-calculated count))))) 
 
+(define (join-list lst count max result)
+  (local
+    [(define ResultList (MakeColorObjectList lst img-width img-height))]
+    (append* ResultList)))
+  ;(join-list-next ResultList count max result)))
+
+
+;;==============================
+; Invert
+(define (Invert-Value lst)
+  (list (- 255 (list-ref lst 0)) (- 255 (list-ref lst 1)) (- 255(list-ref lst 2))))
+  
+(define (MakeInvert invertlist width height)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+      (Invert-Value (list-ref (list-ref invertlist x) y))
+      )))
+
+(define(InvertColor data)
+  (MakeInvert data img-width img-height))
+
+
+
+;;==============================
+;; Convert to single list before convert it to bitmap
+
+;; Program is start from here
+;; 1. RGB List
+
+;; 2. From RGB Convert to Black and White
+(define GrayList MakeGrayList)
+
+
+;; 3. Invert Color
+(define InvertColorList (InvertColor GrayList))
+
+;; 4. Gaussian Blur Filger
+
+
+
+;;=============================
+;; Duy
+;;Create Posterize list
+
+(define posterizeValue 8)
+
+(define PosterizingFilterList
+  (posterize GrayList img-width img-height posterizeValue))
+
+;;(define out3 (open-output-file "PosterizeList.txt" #:exists 'replace))
+;;(write PosterizeList out3)
+;;(close-output-port out3)
+
+;;=============================
+
+;;==============================
+;; Join to single list before convert to bitmap
+   
+;; Convert to make-color object from list
+
 (define FinalGrayList
   (join-list GrayList 0 (length GrayList) null))
 
-;; save to text file for test
-(define grayout (open-output-file "grayout.txt" #:exists 'replace))
-(write FinalGrayList grayout)
-(close-output-port grayout)
+(define FinalPosterizeList
+  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
+
+(define FinalInvertColorList
+  (join-list InvertColorList 0 (length InvertColorList) null))
 
 
-;; from pixel to bitmap
-;; the form of color is the struct so it need to be a list of color struct so it can convert to bitmap
-;;(scale 30 (color-list->bitmap (car pixlist) 4 1))
-;;(scale 30 (color-list->bitmap (cadr pixlist) 3 1))
-(color-list->bitmap FinalGrayList img-width img-height)
 
+(color-list->bitmap FinalPosterizeList img-width img-height)
 
 (define save-photo
-  (save-image (color-list->bitmap FinalGrayList img-width img-height) "Sample-output.png"))
+  (save-image (color-list->bitmap FinalPosterizeList img-width img-height) "Sample-output.png"))
+
