@@ -214,6 +214,7 @@
 
 
 ;;==============================
+;; Chuong Vu
 ;; Gaussian Blur
 
 ;; Read image to bitmap% object
@@ -223,15 +224,18 @@
 (define fm (bitmap->flomap dm))
 
 ;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 4)))
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12 3) 4 1)))
 
 ;; Red RGB from blur image
 (define RGBBlurList
   (RGBList-iter img-width img-height GblurImg))
 
-(define out3 (open-output-file "RGBBlurList.txt" #:exists 'replace))
-(write RGBBlurList out3)
-(close-output-port out3)
+;;(define out3 (open-output-file "RGBBlurList.txt" #:exists 'replace))
+;;(write RGBBlurList out3)
+;;(close-output-port out3)
+
+;;==============================
+
 
 
 
@@ -253,17 +257,17 @@
 (define InvertColorList (InvertColor GrayList))
 
 ;; 4. Gaussian Blur Filger
-
+(define GBlurList RGBBlurList)
 
 
 ;;=============================
 ;; Duy
 ;;Create Posterize list
 
-(define posterizeValue 8)
+(define posterizeValue 20)
 
 (define PosterizingFilterList
-  (posterize GrayList img-width img-height posterizeValue))
+  (posterize GBlurList img-width img-height posterizeValue))
 
 ;;(define out3 (open-output-file "PosterizeList.txt" #:exists 'replace))
 ;;(write PosterizeList out3)
@@ -287,7 +291,7 @@
 
 
 
-;(color-list->bitmap FinalPosterizeList img-width img-height)
+(color-list->bitmap FinalPosterizeList img-width img-height)
 
 (define save-photo
   (save-image (color-list->bitmap FinalPosterizeList img-width img-height) "Sample-output.png"))
