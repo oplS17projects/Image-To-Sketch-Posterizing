@@ -1,16 +1,14 @@
 #lang racket
 ; Version 0.2
-;(require (except-in racket/draw make-pen))
-;(require (prefix-in htdp: 2htdp/image))
-;; for bitmap
-;(require (except-in 2htdp/image make-color))
 
 ; for get-pixel-color
 (require (except-in picturing-programs))
 (require racket/string)
 
-;(require 2htdp/image)
-;(require picturing-programs)
+;; This library is use for do the gaussian blur
+(require images/flomap)
+(require (except-in racket/draw make-pen make-color))
+(define img-name "model-9.jpg")
 
 ;; read the image
 (define imgtest (bitmap "model-9.jpg"))
@@ -32,9 +30,9 @@
 ;; Note: I have to use this method because the get-pixel-color library is create the
 ;; immunate struct which is can't change but I only need RGB value for calculation
 ;; so I choice to write my own function to return the RGB from get-pixel-color.
-(define (get-pixel x y)
+(define (get-pixel x y img)
   (local
-    [(define str (any->string (get-pixel-color y x imgtest)))
+    [(define str (any->string (get-pixel-color y x img)))
      (define str1 (string-split (substring str 15 (- (string-length str) 1))))]
     (list (string->number (list-ref str1 0)) (string->number (list-ref str1 1)) (string->number (list-ref str1 2)))))
 
@@ -42,17 +40,13 @@
 ;; sample picture height = 561 and width = 460
 ;; (get-pixel-color x y pic) where x = width and y = height
 ;; color return red/green/blue/alpha
-(define pixlist
-  (list (list (get-pixel 1 1) (get-pixel 1 2) (get-pixel 1 3) (get-pixel 1 4))
-        (list (get-pixel 300 148) (get-pixel 300 149) (get-pixel 300 150))
-        ))
 
 ;;==============================
 ;; Function to read each pixel and save to list
-(define (RGBList-iter width height)
+(define (RGBList-iter width height img)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
-            (get-pixel x y))))
+            (get-pixel x y img))))
 
 ;; save to text file for test
 ;;(define out (open-output-file "test.txt" #:exists 'replace))
@@ -62,7 +56,7 @@
 
 ;; 1. Read the RGBList
 (define RGBList
-  (RGBList-iter img-width img-height))
+  (RGBList-iter img-width img-height imgtest))
 
 
 ;;==============================
@@ -217,6 +211,34 @@
 
 
 
+
+
+;;==============================
+;; Gaussian Blur
+
+;; Read image to bitmap% object
+(define dm (make-object bitmap% img-name))
+
+;; convert it to flomap
+(define fm (bitmap->flomap dm))
+
+;; Make the gaussian blur
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 4)))
+
+;; Red RGB from blur image
+(define RGBBlurList
+  (RGBList-iter img-width img-height GblurImg))
+
+(define out3 (open-output-file "RGBBlurList.txt" #:exists 'replace))
+(write RGBBlurList out3)
+(close-output-port out3)
+
+
+
+
+
+
+
 ;;==============================
 ;; Convert to single list before convert it to bitmap
 
@@ -265,7 +287,7 @@
 
 
 
-(color-list->bitmap FinalPosterizeList img-width img-height)
+;(color-list->bitmap FinalPosterizeList img-width img-height)
 
 (define save-photo
   (save-image (color-list->bitmap FinalPosterizeList img-width img-height) "Sample-output.png"))
