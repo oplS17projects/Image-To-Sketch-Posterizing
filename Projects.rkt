@@ -8,10 +8,10 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
-(define img-name "test.png")
+(define img-name "house.jpg")
 
 ;; read the image
-(define imgtest (bitmap "test.png"))
+(define imgtest (bitmap "house.jpg"))
 
 ;; get image height
 (define img-height (- (image-height imgtest) 1))
@@ -268,7 +268,7 @@
 (define bwfm (bitmap->flomap bwdm))
 
 ;; Make the gaussian blur
-(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 8) 4)))
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 4) 4)))
 
 ;; Red RGB from blur image
 (define BWRGBBlurList
@@ -358,8 +358,6 @@
 (color-list->bitmap FinalGrayList img-width img-height)
 
 (color-list->bitmap FinalSketch img-width img-height)
-
-;BW image
 
 (define save-photo
   (save-image (color-list->bitmap FinalSketch img-width img-height) "Sample-output.png"))
