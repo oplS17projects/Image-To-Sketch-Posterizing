@@ -8,10 +8,10 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
-(define img-name "model-9.jpg")
+(define img-name "test.png")
 
 ;; read the image
-(define imgtest (bitmap "model-9.jpg"))
+(define imgtest (bitmap "test.png"))
 
 ;; get image height
 (define img-height (- (image-height imgtest) 1))
@@ -170,7 +170,6 @@
 
 ;;==============================
 ; Join list
-
 ;; Convert List to make-color object
 
 (define (lst-value lst)
@@ -181,7 +180,6 @@
     (for/list ([y (in-range 0 width)])
       (lst-value (list-ref (list-ref lstvalue x) y))
       )))
-
 
 (define (join-list-next list-calculated count max result)
   (if (= count max)
@@ -215,7 +213,7 @@
 
 ;;==============================
 ;; Chuong Vu
-;; Gaussian Blur
+;; Gaussian Blur for Color image
 
 ;; Read image to bitmap% object
 (define dm (make-object bitmap% img-name))
@@ -224,21 +222,11 @@
 (define fm (bitmap->flomap dm))
 
 ;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12 3) 4 1)))
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
 
 ;; Red RGB from blur image
 (define RGBBlurList
   (RGBList-iter img-width img-height GblurImg))
-
-;;(define out3 (open-output-file "RGBBlurList.txt" #:exists 'replace))
-;;(write RGBBlurList out3)
-;;(close-output-port out3)
-
-;;==============================
-
-
-
-
 
 
 
@@ -247,17 +235,80 @@
 ;; Convert to single list before convert it to bitmap
 
 ;; Program is start from here
-;; 1. RGB List
+;; 1. RGB List (RGBList)
 
 ;; 2. From RGB Convert to Black and White
 (define GrayList MakeGrayList)
-
 
 ;; 3. Invert Color
 (define InvertColorList (InvertColor GrayList))
 
 ;; 4. Gaussian Blur Filger
 (define GBlurList RGBBlurList)
+
+
+
+
+
+;;==============================
+;; Gaussian Blur from invert
+
+(define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
+
+;; Save BWinvert imange
+(define save-temp (save-image BWimage "temp.png"))
+
+;; Read image to bitmap% object
+(define bwdm (make-object bitmap% "temp.png"))
+
+;; Delete temp file
+(delete-file "temp.png")
+
+;; convert it to flomap
+(define bwfm (bitmap->flomap bwdm))
+
+;; Make the gaussian blur
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 8) 4)))
+
+;; Red RGB from blur image
+(define BWRGBBlurList
+  (RGBList-iter img-width img-height bwGblurImg))
+
+
+;;=============================
+;; Merge GrayList and BWRGBBlurList
+;; if numblur == 255 return numblur
+;; else return (numbw * 256) / (255 - numblur)
+
+(define (colordodge numblur numbw)
+  (if (equal? 255 numblur)
+      numblur
+      (min 255 (round (/ (* numbw 256) (- 255 numblur)))))) 
+
+(define (lst-bend blurlist bwlist)
+  (list (colordodge (list-ref blurlist 0) (list-ref bwlist 0))
+        (colordodge (list-ref blurlist 1) (list-ref bwlist 1))
+        (colordodge (list-ref blurlist 2) (list-ref bwlist 1))
+        ))
+  
+(define (Color-Dodge-Blend-Merge-iter blurlist bwlist width height)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+      (lst-bend (list-ref (list-ref blurlist x) y) (list-ref (list-ref bwlist x) y))
+      )))
+
+
+(define Color-Dodge-Blend-Merge
+  (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
+
+;;(define out3 (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
+;;(write Color-Dodge-Blend-Merge out3)
+;;(close-output-port out3)
+
+
+
+
+
 
 
 ;;=============================
@@ -273,26 +324,43 @@
 ;;(write PosterizeList out3)
 ;;(close-output-port out3)
 
-;;=============================
 
 ;;==============================
 ;; Join to single list before convert to bitmap
-   
 ;; Convert to make-color object from list
 
+;; Create Single BW List
 (define FinalGrayList
   (join-list GrayList 0 (length GrayList) null))
+
+;; Create Single Invert BW List
+(define FinalInvertColorList
+  (join-list InvertColorList 0 (length InvertColorList) null))
+
+;; Create Single Guassian Blur List
+(define FinalGBlurList
+  (join-list GBlurList 0 (length GBlurList) null))
+
 
 (define FinalPosterizeList
   (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
 
-(define FinalInvertColorList
-  (join-list InvertColorList 0 (length InvertColorList) null))
+(define FinalInvertBlurList
+  (join-list BWRGBBlurList 0 (length BWRGBBlurList) null))
 
 
+(define FinalSketch
+  (join-list Color-Dodge-Blend-Merge 0 (length Color-Dodge-Blend-Merge) null))
 
-(color-list->bitmap FinalPosterizeList img-width img-height)
+
+;;==============================
+;BW image
+(color-list->bitmap FinalGrayList img-width img-height)
+
+(color-list->bitmap FinalSketch img-width img-height)
+
+;BW image
 
 (define save-photo
-  (save-image (color-list->bitmap FinalPosterizeList img-width img-height) "Sample-output.png"))
+  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sample-output.png"))
 
