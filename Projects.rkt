@@ -146,14 +146,14 @@
     [(define gray (quotient (+ (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)) 3))]
     (list gray gray gray)))
 
-(define (GrayList-iter-value width height)
+(define (GrayList-iter-value data width height)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
-      (gray-point-value (list-ref (list-ref RGBList x) y))
+      (gray-point-value (list-ref (list-ref data x) y))
       )))
 
 (define MakeGrayList
-  (GrayList-iter-value img-width img-height))
+  (GrayList-iter-value RGBList img-width img-height))
 
 
 
