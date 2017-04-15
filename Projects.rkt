@@ -224,7 +224,7 @@
 ;; Make the gaussian blur
 (define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
 
-;; Red RGB from blur image
+;; Red RGB from blur image (color image)
 (define RGBBlurList
   (RGBList-iter img-width img-height GblurImg))
 
@@ -245,7 +245,6 @@
 
 ;; 4. Gaussian Blur Filger
 (define GBlurList RGBBlurList)
-
 
 
 
@@ -276,6 +275,7 @@
 
 
 ;;=============================
+;; Color Dodge Blend Merge Function
 ;; Merge GrayList and BWRGBBlurList
 ;; if numblur == 255 return numblur
 ;; else return (numbw * 256) / (255 - numblur)
@@ -288,7 +288,7 @@
 (define (lst-bend blurlist bwlist)
   (list (colordodge (list-ref blurlist 0) (list-ref bwlist 0))
         (colordodge (list-ref blurlist 1) (list-ref bwlist 1))
-        (colordodge (list-ref blurlist 2) (list-ref bwlist 1))
+        (colordodge (list-ref blurlist 2) (list-ref bwlist 2))
         ))
   
 (define (Color-Dodge-Blend-Merge-iter blurlist bwlist width height)
@@ -299,7 +299,7 @@
 
 
 (define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
+  (Color-Dodge-Blend-Merge-iter RGBBlurList GrayList img-width img-height))
 
 ;;(define out3 (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
 ;;(write Color-Dodge-Blend-Merge out3)
@@ -315,10 +315,10 @@
 ;; Duy
 ;;Create Posterize list
 
-(define posterizeValue 20)
+;(define posterizeValue 20)
 
-(define PosterizingFilterList
-  (posterize GBlurList img-width img-height posterizeValue))
+;(define PosterizingFilterList
+;  (posterize GBlurList img-width img-height posterizeValue))
 
 ;;(define out3 (open-output-file "PosterizeList.txt" #:exists 'replace))
 ;;(write PosterizeList out3)
@@ -342,8 +342,8 @@
   (join-list GBlurList 0 (length GBlurList) null))
 
 
-(define FinalPosterizeList
-  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
+;(define FinalPosterizeList
+;  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
 
 (define FinalInvertBlurList
   (join-list BWRGBBlurList 0 (length BWRGBBlurList) null))
@@ -355,7 +355,7 @@
 
 ;;==============================
 ;BW image
-(color-list->bitmap FinalGrayList img-width img-height)
+(color-list->bitmap FinalGBlurList img-width img-height)
 
 (color-list->bitmap FinalSketch img-width img-height)
 

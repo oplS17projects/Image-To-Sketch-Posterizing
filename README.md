@@ -1,6 +1,6 @@
 # Posterizing
 
-### Version: 0.2
+### Version: 0.3
 
 ### Statement
 
@@ -43,34 +43,39 @@ We may use Median Blur and redraw the image based on detect and enhance edges al
 ### First Milestone (Sun Apr 9)
 
 Duy Truong:
-* Finished Posterizing Filter
+[x] Finished Posterizing Filter
 
 Chuong Vu:
-* Finished InvertColor Filter
+[x] Finished InvertColor Filter
 
 We both will work on Gaussian Blur Filter. After that we will combine the filter and gray filter togeter to get the final image.
 
 ### Second Milestone (Sun Apr 16)
-Finished the filter and combine everything together.
+[x] Got the Gaussian Blur filter works
+[x] Convert image to sketch.
+
+At this point, we use another two racket library with is `(require images/flomap)` and `(require (except-in racket/draw make-pen make-color)).` to make a `flomap` for generate the Gaussian Blur filter.
 
 ### Public Presentation (Mon Apr 24, Wed Apr 26, or Fri Apr 28 [your date to be determined later])
-Wrap up everything, all bugs should be addressed.
+[] Wrap up everything, all bugs should be addressed. Clean up the code and ready to demonstrate.
 
 ## Group Responsibilities
 
 ### Duy Truong @duytruong92
 Main: Clean up, QA for program
-* Read RGB into 2D list 
-* Merge the data from 2D list into single List
-* Merge gray and filter to 2D list
-* Work on filter
+[x] Read RGB into 2D list 
+[x] Merge the data from 2D list into single List
+[x] Merge gray and filter to 2D list
+[x] Work on filter
+[] Addressed all bugs before demonstrate.
 
 ### Chuong Vu @vdc1703
 Main: Gather information needed for the project.
-* Convert and store the changeable RGB into 2D list
-* Calculate gray values into new 2D list
-* Work on filter
-* Convert new 2D list to a new image
+[x] Convert and store the changeable RGB into 2D list
+[x] Calculate gray values into new 2D list
+[x] Work on filter
+[x] Convert new 2D list to a new image
+[] Clean up the code, ready to demonstrate
 
 
 <!-- Links -->
