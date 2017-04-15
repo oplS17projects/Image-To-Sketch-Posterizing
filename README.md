@@ -76,5 +76,6 @@ Main: Gather information needed for the project.
 
 
 <!-- Links -->
-[output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/OutPut.PNG
+[input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
+[output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sample-output.png
 [diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png
