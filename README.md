@@ -15,6 +15,9 @@ We successfully converted color image to the Black-and-White (BW) image.
 
 
 ## Image:
+Input:
+![alt text][input]
+Output:
 ![alt text][output]
 
 ### Evaluation of Results
