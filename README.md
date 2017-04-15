@@ -60,19 +60,19 @@ Wrap up everything, all bugs should be addressed. Clean up the code and ready to
 
 ### Duy Truong @duytruong92
 Main: Clean up, QA for program
-[x] Read RGB into 2D list 
-[x] Merge the data from 2D list into single List
-[x] Merge gray and filter to 2D list
-[x] Work on filter
-[] Addressed all bugs before demonstrate.
+- [x] Read RGB into 2D list 
+- [x] Merge the data from 2D list into single List
+- [x] Merge gray and filter to 2D list
+- [x] Work on filter
+- [ ] Addressed all bugs before demonstrate.
 
 ### Chuong Vu @vdc1703
 Main: Gather information needed for the project.
-[x] Convert and store the changeable RGB into 2D list
-[x] Calculate gray values into new 2D list
-[x] Work on filter
-[x] Convert new 2D list to a new image
-[] Clean up the code, ready to demonstrate
+- [x] Convert and store the changeable RGB into 2D list
+- [x] Calculate gray values into new 2D list
+- [x] Work on filter
+- [x] Convert new 2D list to a new image
+- [ ] Clean up the code, ready to demonstrate
 
 
 <!-- Links -->
