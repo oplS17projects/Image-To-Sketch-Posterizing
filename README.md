@@ -41,23 +41,20 @@ We may use Median Blur and redraw the image based on detect and enhance edges al
 ## Schedule
 
 ### First Milestone (Sun Apr 9)
-
-Duy Truong:
-[x] Finished Posterizing Filter
-
-Chuong Vu:
-[x] Finished InvertColor Filter
+- [x] Finished Posterizing Filter
+- [x] Finished InvertColor Filter
 
 We both will work on Gaussian Blur Filter. After that we will combine the filter and gray filter togeter to get the final image.
 
 ### Second Milestone (Sun Apr 16)
-[x] Got the Gaussian Blur filter works
-[x] Convert image to sketch.
+- [x] Got the Gaussian Blur filter works
+- [x] Convert image to sketch.
 
 At this point, we use another two racket library with is `(require images/flomap)` and `(require (except-in racket/draw make-pen make-color)).` to make a `flomap` for generate the Gaussian Blur filter.
 
 ### Public Presentation (Mon Apr 24, Wed Apr 26, or Fri Apr 28 [your date to be determined later])
-[] Wrap up everything, all bugs should be addressed. Clean up the code and ready to demonstrate.
+- [ ] 
+Wrap up everything, all bugs should be addressed. Clean up the code and ready to demonstrate.
 
 ## Group Responsibilities
 
