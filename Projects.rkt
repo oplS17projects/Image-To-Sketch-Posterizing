@@ -17,10 +17,10 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
-(define img-name "13.JPG")
+(define img-name "_DSC0035.JPG")
 
 ;; read the image
-(define imginput (bitmap "13.JPG"))
+(define imginput (bitmap "_DSC0035.JPG"))
 ;(define imginput (make-object bitmap% img-name))
 
 ;; get image height
@@ -62,7 +62,6 @@
     (for/list ([y (in-range 0 width)])
            (get-pixel-helper x y img))))
 
-(display 'here2)
 ;; save to text file for test
 ;;(define out (open-output-file "test.txt" #:exists 'replace))
 ;;(write RGBList out)
@@ -73,7 +72,7 @@
 (define RGBList
   (RGBList-iter img-width img-height imginput))
 
-(display 'here3)
+
 ;; ==============================
 ;; Function for Posterize Filter Algorithm
 
@@ -218,7 +217,6 @@
 (define RGBBlurList
   (RGBList-iter img-width img-height GblurImg))
 
-(display 'here4)
 ;;==============================
 ;; Main funtion start from here.
 ;;******************************
@@ -251,7 +249,7 @@
 (define bwfm (bitmap->flomap bwdm))
 
 ;; Make the gaussian blur
-(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 4) 4)))
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 12) 0)))
 
 ;; Red RGB from blur image
 (define BWRGBBlurList
@@ -282,9 +280,11 @@
       )))
 
 
-(define Color-Dodge-Blend-Merge
+(define Color-Dodge-Blend-Merge-BW
   (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
 
+(define Color-Dodge-Blend-Merge-Color
+  (Color-Dodge-Blend-Merge-iter RGBBlurList GrayList img-width img-height))
 ;;(define out3 (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
 ;;(write Color-Dodge-Blend-Merge out3)
 ;;(close-output-port out3)
@@ -342,9 +342,12 @@
 
 ;; 5. Merge 2 and 4 to get a sketch image
 (define FinalSketch
-  (join-list Color-Dodge-Blend-Merge 0 (length Color-Dodge-Blend-Merge) null))
+  (join-list Color-Dodge-Blend-Merge-BW 0 (length Color-Dodge-Blend-Merge-BW) null))
 (color-list->bitmap FinalSketch img-width img-height)
 
+(define FinalSketch2
+  (join-list Color-Dodge-Blend-Merge-Color 0 (length Color-Dodge-Blend-Merge-Color) null))
+(color-list->bitmap FinalSketch2 img-width img-height)
 
 ;;==============================
 (define save-photo
