@@ -1,5 +1,12 @@
 #lang racket
-; Version 0.2
+;; Version 0.3
+
+;; Idea:
+;; 1. Read pixel from image
+;; 2. Convert to Gray Scale
+;; 3. Invert Colors from Gray Scale
+;; 4. Apply Gaussian Blur to Inverted Color
+;; 5. Merge 2 and 4 to get a sketch image
 
 ; for get-pixel-color
 (require (except-in picturing-programs))
@@ -8,16 +15,21 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
-(define img-name "house.jpg")
+(define img-name "test.jpg")
 
 ;; read the image
-(define imgtest (bitmap "house.jpg"))
+(define imginput (bitmap "house.jpg"))
+;(define imginput (make-object bitmap% img-name))
 
 ;; get image height
-(define img-height (- (image-height imgtest) 1))
+(define img-height (- (image-height imginput) 1))
+;(define img-height (- (send imginput get-height) 1))
+
 
 ;; get image width
-(define img-width (- (image-width imgtest) 1))
+(define img-width (- (image-width imginput) 1))
+;(define img-width (- (send imginput get-width) 1))
+
 
 ;; convert struct/anything to string
 (define (any->string any) 
@@ -30,7 +42,7 @@
 ;; Note: I have to use this method because the get-pixel-color library is create the
 ;; immunate struct which is can't change but I only need RGB value for calculation
 ;; so I choice to write my own function to return the RGB from get-pixel-color.
-(define (get-pixel x y img)
+(define (get-pixel-helper x y img)
   (local
     [(define str (any->string (get-pixel-color y x img)))
      (define str1 (string-split (substring str 15 (- (string-length str) 1))))]
@@ -46,22 +58,22 @@
 (define (RGBList-iter width height img)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
-            (get-pixel x y img))))
+           (get-pixel-helper x y img))))
 
+(display 'here2)
 ;; save to text file for test
 ;;(define out (open-output-file "test.txt" #:exists 'replace))
 ;;(write RGBList out)
 ;;(close-output-port out)
 
 
-;; 1. Read the RGBList
+;; 1. Read pixel from image
 (define RGBList
-  (RGBList-iter img-width img-height imgtest))
+  (RGBList-iter img-width img-height imginput))
 
-
-;;==============================
-;; Duy
-;; Function for Posterize Algorithm
+(display 'here3)
+;; ==============================
+;; Function for Posterize Filter Algorithm
 
 (define (round-num num-ori num-int)
   (if (< (- num-ori num-int) 0.5)
@@ -121,25 +133,8 @@
       )))]))
 
 
-
-;;==============================
-;; Create a gray list
-;; This will be the based for any other method. The gray-point will be the final list before convert image
-;(define (gray-point lst)
-;  (local
-;    [(define gray (quotient (+ (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)) 3))]
-;    (make-color gray gray gray)))
-
-;(define (GrayList-iter width height)
-;  (for/list ([x (in-range 0 height)])
-;    (for/list ([y (in-range 0 width)])
-;      (gray-point (list-ref (list-ref RGBList x) y))
-;      )))
-
-
 ;; ==============================
-;; This function is use for Posterizing Filter
-;; Create a gray list value
+;; Convert to GrayScale from RGB Scale
 
 (define (gray-point-value lst)
   (local
@@ -156,36 +151,27 @@
   (GrayList-iter-value img-width img-height))
 
 
-
-
 ;;==============================
-;; Convert 2d list matrix to single list
-;(define FinalList
-;  (append* RGBList))
-    
-;; save to text file for test
-;;(define out1 (open-output-file "list.txt" #:exists 'replace))
-;;(write FinalList out1)
-;;(close-output-port out1)
-
-;;==============================
-; Join list
-;; Convert List to make-color object
+;; Join list
+;; Convert 2D-List to 1D-List with make-color object
+;; make-color object is use for convert the list to bitmap (image)
 
 (define (lst-value lst)
   (make-color (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)))
-  
+
+;; Read each pixel according to (x,y)
 (define (MakeColorObjectList lstvalue width height)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
       (lst-value (list-ref (list-ref lstvalue x) y))
       )))
 
-(define (join-list-next list-calculated count max result)
-  (if (= count max)
-      result
-      (join-list list-calculated (+ count 1) max (append result (list-ref list-calculated count))))) 
+;;(define (join-list-next list-calculated count max result)
+;;  (if (= count max)
+;;      result
+;;      (join-list list-calculated (+ count 1) max (append result (list-ref list-calculated count))))) 
 
+;; Function join-list take a 2D-list and return 1D-list
 (define (join-list lst count max result)
   (local
     [(define ResultList (MakeColorObjectList lst img-width img-height))]
@@ -193,8 +179,11 @@
   ;(join-list-next ResultList count max result)))
 
 
-;;==============================
-; Invert
+;; ==============================
+;; Function to Inverted Color from Gray Scale
+;; The inverted color basically just subtract individual R/G/B from 255 for each pixel
+;; Similer with Join List but we don't use the make-color becaus we want to change value later
+
 (define (Invert-Value lst)
   (list (- 255 (list-ref lst 0)) (- 255 (list-ref lst 1)) (- 255(list-ref lst 2))))
   
@@ -204,16 +193,15 @@
       (Invert-Value (list-ref (list-ref invertlist x) y))
       )))
 
-(define(InvertColor data)
-  (MakeInvert data img-width img-height))
+;; Function InvertColor take a list and return a list
+(define(InvertColor GrayScale)
+  (MakeInvert GrayScale img-width img-height))
 
 
-
-
-
-;;==============================
-;; Chuong Vu
-;; Gaussian Blur for Color image
+;; ==============================
+;; Apply Gaussian Blur to Color bitmap
+;; By using the flomap library, apply the built-in function flomap-gaussian-blur
+;; to get the blur image
 
 ;; Read image to bitmap% object
 (define dm (make-object bitmap% img-name))
@@ -224,37 +212,32 @@
 ;; Make the gaussian blur
 (define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
 
-;; Red RGB from blur image (color image)
+;; Read RGB from blur image (color image)
 (define RGBBlurList
   (RGBList-iter img-width img-height GblurImg))
 
 
-
-
 ;;==============================
-;; Convert to single list before convert it to bitmap
+;; Main funtion start from here.
+;;******************************
 
-;; Program is start from here
-;; 1. RGB List (RGBList)
-
-;; 2. From RGB Convert to Black and White
+;; 2. Convert to Gray Scale
 (define GrayList MakeGrayList)
 
-;; 3. Invert Color
+;; 3. Invert Colors from Gray Scale
 (define InvertColorList (InvertColor GrayList))
 
-;; 4. Gaussian Blur Filger
+;; 4. Apply Gaussian Blur to Inverted Color
 (define GBlurList RGBBlurList)
 
 
+;; ==============================
+;; Gaussian Blur from inverted color
 
-
-;;==============================
-;; Gaussian Blur from invert
 
 (define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
 
-;; Save BWinvert imange
+;; Save BWinvert image
 (define save-temp (save-image BWimage "temp.png"))
 
 ;; Read image to bitmap% object
@@ -299,7 +282,7 @@
 
 
 (define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter RGBBlurList GrayList img-width img-height))
+  (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
 
 ;;(define out3 (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
 ;;(write Color-Dodge-Blend-Merge out3)
@@ -332,33 +315,37 @@
 ;; Create Single BW List
 (define FinalGrayList
   (join-list GrayList 0 (length GrayList) null))
+;(color-list->bitmap FinalGrayList img-width img-height)
+
 
 ;; Create Single Invert BW List
 (define FinalInvertColorList
   (join-list InvertColorList 0 (length InvertColorList) null))
+;(color-list->bitmap FinalInvertColorList img-width img-height)
+
 
 ;; Create Single Guassian Blur List
 (define FinalGBlurList
   (join-list GBlurList 0 (length GBlurList) null))
+;(color-list->bitmap FinalGBlurList img-width img-height)
 
+;; Create Single Posterize List
+;;(define FinalPosterizeList
+;;  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
+;(color-list->bitmap FinalGrayList img-width img-height)
 
-;(define FinalPosterizeList
-;  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
-
-(define FinalInvertBlurList
+;; Create Single Inverted Blur List
+(define FinalInvertedBlurList
   (join-list BWRGBBlurList 0 (length BWRGBBlurList) null))
+;(color-list->bitmap FinalInvertedBlurList img-width img-height)
 
-
+;; 5. Merge 2 and 4 to get a sketch image
 (define FinalSketch
   (join-list Color-Dodge-Blend-Merge 0 (length Color-Dodge-Blend-Merge) null))
+(color-list->bitmap FinalSketch img-width img-height)
 
 
 ;;==============================
-;BW image
-(color-list->bitmap FinalGBlurList img-width img-height)
-
-(color-list->bitmap FinalSketch img-width img-height)
-
-(define save-photo
-  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sample-output.png"))
+;(define save-photo
+;  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sample-output.png"))
 
