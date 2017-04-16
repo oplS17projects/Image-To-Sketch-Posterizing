@@ -1,6 +1,8 @@
 #lang racket
 ;; Version 0.3
 
+
+;; Due to the time consumming, image with size less than 1024x800.
 ;; Idea:
 ;; 1. Read pixel from image
 ;; 2. Convert to Gray Scale
@@ -15,10 +17,10 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
-(define img-name "test.jpg")
+(define img-name "13.JPG")
 
 ;; read the image
-(define imginput (bitmap "house.jpg"))
+(define imginput (bitmap "13.JPG"))
 ;(define imginput (make-object bitmap% img-name))
 
 ;; get image height
@@ -134,7 +136,7 @@
 
 
 ;; ==============================
-;; Convert to GrayScale from RGB Scale
+;; Convert RGB Scale to GrayScale
 
 (define (gray-point-value lst)
   (local
@@ -216,7 +218,7 @@
 (define RGBBlurList
   (RGBList-iter img-width img-height GblurImg))
 
-
+(display 'here4)
 ;;==============================
 ;; Main funtion start from here.
 ;;******************************
@@ -232,8 +234,7 @@
 
 
 ;; ==============================
-;; Gaussian Blur from inverted color
-
+;; Apply Gaussian Blur to Inverted Color
 
 (define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
 
@@ -313,20 +314,20 @@
 ;; Convert to make-color object from list
 
 ;; Create Single BW List
-(define FinalGrayList
-  (join-list GrayList 0 (length GrayList) null))
+;(define FinalGrayList
+;  (join-list GrayList 0 (length GrayList) null))
 ;(color-list->bitmap FinalGrayList img-width img-height)
 
 
 ;; Create Single Invert BW List
-(define FinalInvertColorList
-  (join-list InvertColorList 0 (length InvertColorList) null))
+;(define FinalInvertColorList
+;  (join-list InvertColorList 0 (length InvertColorList) null))
 ;(color-list->bitmap FinalInvertColorList img-width img-height)
 
 
 ;; Create Single Guassian Blur List
-(define FinalGBlurList
-  (join-list GBlurList 0 (length GBlurList) null))
+;(define FinalGBlurList
+;  (join-list GBlurList 0 (length GBlurList) null))
 ;(color-list->bitmap FinalGBlurList img-width img-height)
 
 ;; Create Single Posterize List
@@ -335,8 +336,8 @@
 ;(color-list->bitmap FinalGrayList img-width img-height)
 
 ;; Create Single Inverted Blur List
-(define FinalInvertedBlurList
-  (join-list BWRGBBlurList 0 (length BWRGBBlurList) null))
+;(define FinalInvertedBlurList
+;  (join-list BWRGBBlurList 0 (length BWRGBBlurList) null))
 ;(color-list->bitmap FinalInvertedBlurList img-width img-height)
 
 ;; 5. Merge 2 and 4 to get a sketch image
@@ -346,6 +347,6 @@
 
 
 ;;==============================
-;(define save-photo
-;  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sample-output.png"))
+(define save-photo
+  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sketch.png"))
 
