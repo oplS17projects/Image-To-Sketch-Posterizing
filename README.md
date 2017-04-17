@@ -20,11 +20,15 @@ Our team try to use less the library of the racket, we implement new function ba
 ### Library
 For the libary of the racket, Our team use only two library to edit the image.
 * String - Using Sting libary to read and store the pixel of the image
-* Blur - Making the image 
+* flomap - to make a `flomap` for generate the Gaussian Blur filter.
+* draw make-pen make-color - support bitmap% different type object of bitmap. To convert from bitmap to flomap
 
 ### Deliverable and Demonstration
 We successfully to convert from the original image to pencil image.
 
+### Function Detail
+
+1. 
 
 ## Image:
 Input:
