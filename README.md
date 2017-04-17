@@ -28,7 +28,7 @@ We successfully to convert from the original image to pencil image.
 
 ### Function Detail
 
-1.Get pixel function
+1. Get pixel function
 ```racket
 ;; function get pixel at x and y
 ;; Local str is use to convert the color struct to string
@@ -44,6 +44,103 @@ We successfully to convert from the original image to pencil image.
     (list (string->number (list-ref str1 0)) (string->number (list-ref str1 1)) (string->number (list-ref str1 2)))))
 
 ```
+
+2. Save to List
+```Racket
+;; Function to read each pixel and save to list
+(define (RGBList-iter width height img)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+           (get-pixel-helper x y img))))
+```
+
+3. Convert to gray scale
+* Input : RGB list
+* Output : Gray-List
+```Racket
+(define (gray-point-value lst)
+  (local
+    [(define gray (quotient (+ (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)) 3))]
+    (list gray gray gray)))
+
+(define (GrayList-iter-value data width height)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+      (gray-point-value (list-ref (list-ref data x) y))
+      )))
+
+(define MakeGrayList
+  (GrayList-iter-value RGBList img-width img-height))
+```
+
+* Image Ouput
+4. Convert to Inverted Gray Image
+* Input: Gray-List
+* Output: InvertColor-List
+
+```Racket
+
+(define (Invert-Value lst)
+  (list (- 255 (list-ref lst 0)) (- 255 (list-ref lst 1)) (- 255(list-ref lst 2))))
+  
+(define (MakeInvert invertlist width height)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+      (Invert-Value (list-ref (list-ref invertlist x) y))
+      )))
+```
+* Image Output
+
+5. Apply Gaussian Blur
+* Input: InvertColor-List
+* Ouput: Blured-List
+
+```Racket
+
+;; Read image to bitmap% object
+(define dm (make-object bitmap% img-name))
+
+;; convert it to flomap
+(define fm (bitmap->flomap dm))
+
+;; Make the gaussian blur
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
+
+;; Read RGB from blur image (color image)
+(define RGBBlurList
+  (RGBList-iter img-width img-height GblurImg))
+```
+
+* Image output:
+
+6. Image Color Dodge Merge
+* Input: Blured-List && Gray-List
+* Output: Final Image
+ 
+ ```Racket
+ ;; Apply Gaussian Blur to Inverted Color
+
+(define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
+
+;; Save BWinvert image
+(define save-temp (save-image BWimage "temp.png"))
+
+;; Read image to bitmap% object
+(define bwdm (make-object bitmap% "temp.png"))
+
+;; Delete temp file
+(delete-file "temp.png")
+
+;; convert it to flomap
+(define bwfm (bitmap->flomap bwdm))
+
+;; Make the gaussian blur
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 12) 0)))
+
+;; Red RGB from blur image
+(define BWRGBBlurList
+  (RGBList-iter img-width img-height bwGblurImg))
+ ```
 
 ## Image:
 Input:
