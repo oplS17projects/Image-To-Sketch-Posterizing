@@ -1,17 +1,27 @@
-# Posterizing
+# Pencil Posterizing
 
-### Version: 0.3
+### Version: 0.4
 
-### Statement
+### Team Member:
++ Duy Truong
++ Chuong Vu
+### Overview
 
-Our project is simply convert an image to cartoon/stretch image. We plans implement an application that allow users convert any image that they wanted into a difference style.
+For Pencil Posterrizing Poject, our team used racket language to edit and create a new image from the original image. We have a lot different ways to convert (cartoon, gray, pencil). Our team focus on pencil posterizing. However, Our team also implement some extra filter can help the user can convert ti different type of image. 
 
 ### Analysis
 An digital image is a contributed by millions pixel/dot. And each pixel is contain 3 values Reg/Green/Blue (RGB) and these value make a color. Our program is load every pixel (RGB) into a list of list (or we can say 2-dimension array or matrix x/y). The pixel in the matrix is represent each dot on the image so it help us easily keep track the color at the position x/y. By that, we can can change the color to anything we want and for this project, our goal it convert the image to cartoon/stretch image.
-
+Our team try to use less the library of the racket, we implement new function base on the following algorithm:
+* Invert Image
+* Gray Scale
+* Color Image Dodge Merge
+* Poterzing Image
+For the libary of the racket, Our team use only two library to edit the image.
+* String - Using Sting libary to read and store the pixel of the image
+* Blur - Making the image 
 
 ### Deliverable and Demonstration
-We successfully converted color image to the Black-and-White (BW) image.
+We successfully to convert from the original image to pencil image.
 
 
 ## Image:
