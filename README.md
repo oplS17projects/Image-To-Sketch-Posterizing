@@ -1,6 +1,6 @@
 # Pencil Posterizing
 
-### Version: 0.4
+### Version: 0.3
 
 ### Team Member:
 + Duy Truong
@@ -27,33 +27,6 @@ For the libary of the racket, Our team use only two library to edit the image.
 We successfully to convert from the original image to pencil image.
 
 ### Function Detail
-
-1. Get pixel from image
-
-`
-;; function get pixel at x and y
-;; Local str is use to convert the color struct to string
-;; Local str1 get the substring and split it into a list
-;; finally, convert back the string to number go now I get RGB value number
-;; Note: we have to use this method because the get-pixel-color library is create the
-;; immunate struct which is can't change but we only need RGB value for calculation
-;; so we choice to write my own function to return the RGB from get-pixel-color.
-(define (get-pixel-helper x y img)
-  (local
-    [(define str (any->string (get-pixel-color y x img)))
-     (define str1 (string-split (substring str 15 (- (string-length str) 1))))]
-    (list (string->number (list-ref str1 0)) (string->number (list-ref str1 1)) (string->number (list-ref str1 2)))))
-`
-
-2. Save Pixel to List
-
-`
-;; Function to read each pixel and save to list
-(define (RGBList-iter width height img)
-  (for/list ([x (in-range 0 height)])
-    (for/list ([y (in-range 0 width)])
-           (get-pixel-helper x y img))))
-`
 
 ## Image:
 Input:
