@@ -28,6 +28,23 @@ We successfully to convert from the original image to pencil image.
 
 ### Function Detail
 
+1.Get pixel function
+```racket
+;; function get pixel at x and y
+;; Local str is use to convert the color struct to string
+;; Local str1 get the substring and split it into a list
+;; finally, convert back the string to number go now I get RGB value number
+;; Note: We have to use this method because the get-pixel-color library is create the
+;; immunate struct which is can't change but We only need RGB value for calculation
+;; so We choice to write my own function to return the RGB from get-pixel-color.
+(define (get-pixel-helper x y img)
+  (local
+    [(define str (any->string (get-pixel-color y x img)))
+     (define str1 (string-split (substring str 15 (- (string-length str) 1))))]
+    (list (string->number (list-ref str1 0)) (string->number (list-ref str1 1)) (string->number (list-ref str1 2)))))
+
+```
+
 ## Image:
 Input:
 ![alt text][input]
