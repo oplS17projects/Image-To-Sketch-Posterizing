@@ -1,6 +1,6 @@
 # Sketch Posterizing
 
-### Version: 0.3
+### Version: 1.0
 
 ### Team Member:
 + Duy Truong
