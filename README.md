@@ -16,6 +16,8 @@ Our team try to use less the library of the racket, we implement new function ba
 * Gray Scale
 * Color Image Dodge Merge
 * Poterzing Image
+
+### Library
 For the libary of the racket, Our team use only two library to edit the image.
 * String - Using Sting libary to read and store the pixel of the image
 * Blur - Making the image 
