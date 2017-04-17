@@ -29,6 +29,7 @@ We successfully to convert from the original image to pencil image.
 ### Function Detail
 
 1. Get pixel from image
+
 `
 ;; function get pixel at x and y
 ;; Local str is use to convert the color struct to string
@@ -42,8 +43,8 @@ We successfully to convert from the original image to pencil image.
     [(define str (any->string (get-pixel-color y x img)))
      (define str1 (string-split (substring str 15 (- (string-length str) 1))))]
     (list (string->number (list-ref str1 0)) (string->number (list-ref str1 1)) (string->number (list-ref str1 2)))))
-
 `
+
 2. Save Pixel to List
 
 `
