@@ -141,7 +141,73 @@ We successfully to convert from the original image to pencil image.
 (define BWRGBBlurList
   (RGBList-iter img-width img-height bwGblurImg))
  ```
+ 
+# Extra filter:
+* Posterizing:
+```Racket
 
+;; Function for Posterize Filter Algorithm
+
+(define (round-num num-ori num-int)
+  (if (< (- num-ori num-int) 0.5)
+      (floor num-ori)
+      (ceiling num-ori)))
+
+
+(define (posterize-point lst numOfArea numOfValues)
+  (local
+    [(define redAreaFloat (/ (list-ref lst 0) numOfArea))
+     (define redArea (round-num redAreaFloat (floor redAreaFloat)))
+     (define greenAreaFloat (/ (list-ref lst 1) numOfArea))
+     (define greenArea (round-num greenAreaFloat (floor greenAreaFloat)))
+     (define blueAreaFloat (/ (list-ref lst 2) numOfArea))
+     (define blueArea (round-num blueAreaFloat (floor blueAreaFloat)))
+     (define newredfloat 0.0)
+     (define newgreengfloat 0.0)
+     (define newbluefloat 0.0)
+     (define newred 0)
+     (define newgreen 0)
+     (define newblue 0)]
+    
+    (cond
+      [(> redArea redAreaFloat)(set! redArea (- redArea 1))])
+    (set! newredfloat (* numOfValues redArea))
+    (set! newred (round-num newredfloat (floor newredfloat)))
+    (cond
+      [(> newred newredfloat)(set! newred (- newred 1))])
+
+
+    (cond
+      [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
+    (set! newgreengfloat (* numOfValues greenArea))
+    (set! newgreen (round-num newgreengfloat (floor newgreengfloat)))
+    (cond
+      [(> newgreen newgreengfloat)(set! newgreen (- newgreen 1))])
+    
+    (cond
+      [(> blueArea blueAreaFloat)(set! blueArea (- blueArea 1))])
+    (set! newbluefloat (* numOfValues blueArea))
+    (set! newblue (round-num newbluefloat (floor newbluefloat)))
+    (cond
+      [(> newblue newbluefloat)(set! newblue (- newblue 1))])
+    (list newred newgreen newblue)
+    
+    ))
+   
+
+(define (posterize data width height value)
+  (cond [(and (>= value 2) (<= value 255))
+      (local
+        [(define numOfAreas (/ 256 value))
+         (define numOfValues (/ 255 (- value 1)))]
+        (for/list ([x (in-range 0 height)])
+          (for/list ([y (in-range 0 width)])
+            (posterize-point (list-ref (list-ref data x) y) numOfAreas numOfValues)
+      )))]))
+```
+
+Output Example:
+ 
 ## Image:
 Input:
 ![alt text][input]
