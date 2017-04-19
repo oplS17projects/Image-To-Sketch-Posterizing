@@ -179,7 +179,7 @@
 
 
 (define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter BlurValue gray-scale img-width img-height))
+  (Color-Dodge-Blend-Merge-iter BlurValue gray-scalegi img-width img-height))
   
 
 (define out (open-output-file "BlurValue.txt" #:exists 'replace))
