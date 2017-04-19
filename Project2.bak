@@ -87,31 +87,11 @@
   (RGBmap-iter '() PixelsList))
 
 
-;(define out1 (open-output-file "RGBmap.txt" #:exists 'replace))
-;(write RGBmap out1)
-;(close-output-port out1)
-
-;; ===========================
-;; Convert to gray scale
-(define (get-gray-value num)
-  (local
-    [(define red (bitwise-bit-field num 0 7))
-     (define green (bitwise-bit-field num 8 15))
-     (define blue (bitwise-bit-field num 16 23))]
-    
-    (quotient (+ red green blue) 3)))
-
-(define (gray-scale-helper result lst )
-  (if (null? lst)
-      result
-      (gray-scale-helper (cons (get-gray-value (car lst)) result) (cdr lst))))
-
-(define gray-scale
-  (gray-scale-helper '() RGBmap))
-
-(define out1 (open-output-file "grayscale.txt" #:exists 'replace))
-(write gray-scale out1)
+(define out1 (open-output-file "RGBmap.txt" #:exists 'replace))
+(write RGBmap out1)
 (close-output-port out1)
+
+
         
 
 
