@@ -7,7 +7,9 @@
 + Chuong Vu
 ### Overview
 
-For Pencil Posterrizing Poject, our team used racket language to edit and create a new image from the original image. We have a lot different ways to convert (cartoon, gray, sketch). Our team focus on Sketch posterizing. However, Our team also implement some extra filters can help the user can convert to different type of image. 
+For Pencil Posterrizing Poject, our team used racket language to edit and create a new image from the original image. We have a lot different ways to convert (cartoon, gray, sketch). Our team focus on Sketch posterizing. However, Our team also implement some extra filters can help the user can convert to different type of image. we used 2 different algorithms to convert the image.
+1. Using the bitmap
+2. Read the bitmap and convert value of RGB to 1 24 bits values.
 
 ### Analysis
 An digital image is a contributed by millions pixel/dot. And each pixel is contain 3 values Reg/Green/Blue (RGB) and these value make a color. Our program is load every pixel (RGB) into a list of list (or we can say 2-dimension array or matrix x/y). The pixel in the matrix is represent each dot on the image so it help us easily keep track the color at the position x/y. By that, we can can change the color to anything we want and for this project, our goal it convert the image to cartoon/stretch image.
@@ -28,6 +30,7 @@ We successfully to convert from the original image to pencil image.
 
 ### Function Detail
 
+## Algorithm 1:
 1. Get pixel function
 ```racket
 ;; function get pixel at x and y
@@ -207,7 +210,9 @@ We successfully to convert from the original image to pencil image.
 ```
 
 Output Example:
- 
+
+## Algorithm 2:
+
 ## Image:
 Input:
 ![alt text][input]
