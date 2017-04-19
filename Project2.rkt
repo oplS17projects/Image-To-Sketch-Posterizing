@@ -124,20 +124,6 @@
 
 
 ;; ===============================
-;; function convert back to bitmap (image)
-
-(define test (make-object bitmap% img-width img-height))
-
-(define finallist
-  (reverse (back-to-argb gray-scale)))
-  
-(define out1 (open-output-file "finallist.txt" #:exists 'replace))
-(write (append* (reverse (back-to-argb gray-scale))) out1)
-(close-output-port out1)
-
-(send test set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
-
-;; ===============================
 ;; Invert Colors from Gray Scale
 
 (define (get-invert-value num)
@@ -156,10 +142,61 @@
   (invert-color '() gray-scale))
 
 
+;; ==============================
+;; Apply Gaussian Blur to Color bitmap
+;; By using the flomap library, apply the built-in function flomap-gaussian-blur
+;; to get the blur image
+(define InvertedBitmap (make-object bitmap% img-width img-height))
+
+(define InvertedList
+  (back-to-argb inverts-value))
+
+(send InvertedBitmap set-argb-pixels 0 0 img-width img-height (list->bytes (append* InvertedList)))
+
+;; convert it to flomap
+(define fm (bitmap->flomap InvertedBitmap))
+
+;; Make the gaussian blur
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 4) 2)))
+
+(send GblurImg get-argb-pixels 0 0 img-width img-height  pixels)
+
+(define BlurMap (bytes->list pixels))
+
+(define BlurValue
+  (RGBmap-iter '() BlurMap))
+
+
+;;=============================
+;; Color Dodge Blend Merge Function
+;; Merge GrayList and BWRGBBlurList
+;; if numblur == 255 return numblur
+;; else return (numbw * 256) / (255 - numblur)
 
 
 
 
+
+
+(define Color-Dodge-Blend-Merge
+  (Color-Dodge-Blend-Merge-iter BlurValue gray-scale img-width img-height))
+  
+
+(define out (open-output-file "BlurValue.txt" #:exists 'replace))
+(write BlurValue out)
+(close-output-port out)
+
+  
+  
+;; ===============================
+;; function convert back to bitmap (image)
+
+;(define test (make-object bitmap% img-width img-height))
+
+;(define finallist
+;  (back-to-argb inverts-value))
+
+;(send test set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
 
 
 
