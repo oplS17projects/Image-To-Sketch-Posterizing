@@ -313,6 +313,12 @@
   (join-list GrayList 0 (length GrayList) null))
 (color-list->bitmap FinalGrayList img-width img-height)
 
+(define out1 (open-output-file "FinalGrayList.txt" #:exists 'replace))
+(write FinalGrayList out1)
+(close-output-port out1)
+
+
+
 
 ;; Create Single Invert BW List
 ;(define FinalInvertColorList
