@@ -55,8 +55,14 @@
 ;(write (list->bytes testlist) out1)
 ;(close-output-port out1)
 
-
-
+;; ============================
+;; function extract number to red/green/blue value from binary
+(define (extract-rgb num)
+  (local
+    [(define red (bitwise-bit-field num 0 7))
+     (define green (bitwise-bit-field num 8 15))
+     (define blue (bitwise-bit-field num 16 23))]
+    (list red green blue)))
 
 ;; ============================
 ;; Get to single list with 1 value represent for 1 pixel in the list
@@ -65,16 +71,15 @@
 (define (get-b lst) (cadddr lst))
 (define (remain-lst lst) (cddddr lst))
 
+;; using bitwise or/and with shift to store RGB value to 24 bits.
 (define (join-value red green blue)
- ; (list red green blue))
   (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
   
- 
 (define (RGBmap-iter result lst)
   (if (null? lst)
       result
       (RGBmap-iter
-       (cons result (join-value (get-r lst) (get-g lst) (get-b lst)))
+       (cons (join-value (get-r lst) (get-g lst) (get-b lst)) result)
        (remain-lst lst))))
 
 
@@ -87,17 +92,6 @@
 (close-output-port out1)
 
 
-
-
-(define numrgb (bitwise-ior (bitwise-and 12 #xFF) (arithmetic-shift (bitwise-and 20 #xFF) 8) (arithmetic-shift (bitwise-and 30 #xFF) 16)))
-
-
-(define (extract-rgb num)
-  (local
-    [(define red (bitwise-bit-field num 0 7))
-     (define green (bitwise-bit-field num 8 15))
-     (define blue (bitwise-bit-field num 16 23))]
-    (list red green blue)))
         
 
 
