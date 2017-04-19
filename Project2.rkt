@@ -137,8 +137,23 @@
 
 (send test set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
 
+;; ===============================
+;; Invert Colors from Gray Scale
 
+(define (get-invert-value num)
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))]
+    (join-value (- 255 red) (- 255 green) (- 255 blue))))
 
+(define (invert-color result lst)
+  (if (null? lst)
+      result
+      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
+
+(define inverts-value
+  (invert-color '() gray-scale))
 
 
 
