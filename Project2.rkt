@@ -143,9 +143,10 @@
 
 
 ;; ==============================
-;; Apply Gaussian Blur to Color bitmap
+;; Apply Gaussian Blur to Inverted Color
 ;; By using the flomap library, apply the built-in function flomap-gaussian-blur
 ;; to get the blur image
+
 (define InvertedBitmap (make-object bitmap% img-width img-height))
 
 (define InvertedList
@@ -157,7 +158,7 @@
 (define fm (bitmap->flomap InvertedBitmap))
 
 ;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 4) 2)))
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 2)))
 
 (send GblurImg get-argb-pixels 0 0 img-width img-height  pixels)
 
@@ -173,33 +174,53 @@
 ;; if numblur == 255 return numblur
 ;; else return (numbw * 256) / (255 - numblur)
 
+(define (colordodge numblur numbw)
+  (if (equal? 255 numblur)
+      numblur
+      (min 255 (round (/ (* numbw 256) (- 255 numblur)))))) 
+
+(define (value-return blist glist)
+  (join-value (colordodge (get-r blist) (get-r glist))
+        (colordodge (get-g blist) (get-g glist))
+        (colordodge (get-b blist) (get-b glist))
+        ))
+
+(define (return-dodge num1 num2)
+  (local
+    [(define rgb1 (extract-rgb num1))
+     (define rgb2 (extract-rgb num2))]
+    (value-return rgb1 rgb2)))
 
 
-
+(define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
+  (if (null? blurlist)
+      result
+      (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
+                                    (cdr blurlist) (cdr bwlist))))
 
 
 (define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter BlurValue gray-scalegi img-width img-height))
+  (Color-Dodge-Blend-Merge-iter '() BlurValue gray-scale))
   
 
-(define out (open-output-file "BlurValue.txt" #:exists 'replace))
-(write BlurValue out)
-(close-output-port out)
 
   
   
 ;; ===============================
 ;; function convert back to bitmap (image)
 
-;(define test (make-object bitmap% img-width img-height))
+(define test (make-object bitmap% img-width img-height))
 
-;(define finallist
-;  (back-to-argb inverts-value))
+(define finallist
+  (back-to-argb Color-Dodge-Blend-Merge))
 
-;(send test set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
+(send test set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
+test
 
 
-
+(define out (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
+(write Color-Dodge-Blend-Merge out)
+(close-output-port out)
 
 
 
