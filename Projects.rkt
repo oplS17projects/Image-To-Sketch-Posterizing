@@ -1,7 +1,6 @@
 #lang racket
 ;; Version 0.3
 
-
 ;; Due to the time consumming, image with size less than 1024x800.
 ;; Idea:
 ;; 1. Read pixel from image
@@ -17,10 +16,12 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
-(define img-name "_DSC0035.JPG")
+(define img-name "house.jpg")
+
+;(define path (string-append (path->string (current-directory)) img-name))
 
 ;; read the image
-(define imginput (bitmap "_DSC0035.JPG"))
+(define imginput (bitmap "house.jpg"))
 ;(define imginput (make-object bitmap% img-name))
 
 ;; get image height
@@ -211,7 +212,7 @@
 (define fm (bitmap->flomap dm))
 
 ;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 4) 2)))
 
 ;; Read RGB from blur image (color image)
 (define RGBBlurList
@@ -227,8 +228,6 @@
 ;; 3. Invert Colors from Gray Scale
 (define InvertColorList (InvertColor GrayList))
 
-;; 4. Apply Gaussian Blur to Inverted Color
-(define GBlurList RGBBlurList)
 
 
 ;; ==============================
@@ -248,12 +247,28 @@
 ;; convert it to flomap
 (define bwfm (bitmap->flomap bwdm))
 
-;; Make the gaussian blur
-(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 12) 0)))
+;; 4. Apply Gaussian Blur to Inverted Color
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 0) 0)))
 
 ;; Red RGB from blur image
 (define BWRGBBlurList
   (RGBList-iter img-width img-height bwGblurImg))
+
+
+
+;;=============================
+;; Duy
+;;Create Posterize list
+
+(define posterizeValue 20)
+
+(define PosterizingFilterList
+  (posterize GrayList img-width img-height posterizeValue))
+
+;;(define out3 (open-output-file "PosterizeList.txt" #:exists 'replace))
+;;(write PosterizeList out3)
+;;(close-output-port out3)
+
 
 
 ;;=============================
@@ -280,33 +295,13 @@
       )))
 
 
-(define Color-Dodge-Blend-Merge-BW
+(define Color-Dodge-Blend-Merge
   (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
 
-(define Color-Dodge-Blend-Merge-Color
-  (Color-Dodge-Blend-Merge-iter RGBBlurList GrayList img-width img-height))
 ;;(define out3 (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
 ;;(write Color-Dodge-Blend-Merge out3)
 ;;(close-output-port out3)
 
-
-
-
-
-
-
-;;=============================
-;; Duy
-;;Create Posterize list
-
-;(define posterizeValue 20)
-
-;(define PosterizingFilterList
-;  (posterize GBlurList img-width img-height posterizeValue))
-
-;;(define out3 (open-output-file "PosterizeList.txt" #:exists 'replace))
-;;(write PosterizeList out3)
-;;(close-output-port out3)
 
 
 ;;==============================
@@ -314,9 +309,9 @@
 ;; Convert to make-color object from list
 
 ;; Create Single BW List
-;(define FinalGrayList
-;  (join-list GrayList 0 (length GrayList) null))
-;(color-list->bitmap FinalGrayList img-width img-height)
+(define FinalGrayList
+  (join-list GrayList 0 (length GrayList) null))
+(color-list->bitmap FinalGrayList img-width img-height)
 
 
 ;; Create Single Invert BW List
@@ -341,13 +336,13 @@
 ;(color-list->bitmap FinalInvertedBlurList img-width img-height)
 
 ;; 5. Merge 2 and 4 to get a sketch image
+
 (define FinalSketch
-  (join-list Color-Dodge-Blend-Merge-BW 0 (length Color-Dodge-Blend-Merge-BW) null))
+  (join-list Color-Dodge-Blend-Merge 0 (length Color-Dodge-Blend-Merge) null))
+
+;(display "With Gaussian Filter")
 (color-list->bitmap FinalSketch img-width img-height)
 
-(define FinalSketch2
-  (join-list Color-Dodge-Blend-Merge-Color 0 (length Color-Dodge-Blend-Merge-Color) null))
-(color-list->bitmap FinalSketch2 img-width img-height)
 
 ;;==============================
 (define save-photo
