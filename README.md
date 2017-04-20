@@ -267,6 +267,9 @@ We successfully to convert from the original image to pencil image.
 ```
 
 4. Convert to gray scale
+* Input: Number
+* Output:  24bits Gray Number 
+
 ```racket
 
 (define (get-gray-value num)
@@ -287,6 +290,8 @@ We successfully to convert from the original image to pencil image.
   (gray-scale-helper '() RGBmap))
 ```
 5.  Invert Colors from Gray Scale
+* Input: Gray Number 
+* Output:  24bits Invert Number 
 
 ```racket
 
@@ -307,6 +312,8 @@ We successfully to convert from the original image to pencil image.
 ```
 
 6. Apply Gaussian Blur to Inverted Color
+* Input: Invert Number 
+* Output:  24bits Blur Invert Number 
 
 ```racket
 ;; By using the flomap library, apply the built-in function flomap-gaussian-blur
@@ -333,6 +340,9 @@ We successfully to convert from the original image to pencil image.
   (RGBmap-iter '() BlurMap))
 ```
 7. Color Dodge Blend Merge Function
+* Input: Invert Blur Number and Gray value 
+* Output:  final image value
+
 ```racket
 ;; Merge GrayList and BWRGBBlurList
 ;; if numblur == 255 return numblur
