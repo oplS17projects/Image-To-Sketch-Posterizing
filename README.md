@@ -76,7 +76,6 @@ We successfully to convert from the original image to pencil image.
   (GrayList-iter-value RGBList img-width img-height))
 ```
 
-* Image Ouput
 4. Convert to Inverted Gray Image
 * Input: Gray-List
 * Output: InvertColor-List
@@ -92,7 +91,6 @@ We successfully to convert from the original image to pencil image.
       (Invert-Value (list-ref (list-ref invertlist x) y))
       )))
 ```
-* Image Output
 
 5. Apply Gaussian Blur
 * Input: InvertColor-List
@@ -114,7 +112,6 @@ We successfully to convert from the original image to pencil image.
   (RGBList-iter img-width img-height GblurImg))
 ```
 
-* Image output:
 
 6. Image Color Dodge Merge
 * Input: Blured-List && Gray-List
@@ -209,9 +206,65 @@ We successfully to convert from the original image to pencil image.
       )))]))
 ```
 
-Output Example:
-
 ## Algorithm 2:
+
+1. Get pixels value
+* Input: Image
+* Output: List of RGB value
+```racket 
+
+;; Read image to bitmap% object
+
+(define pixels (make-bytes (* img-height img-width 4)))
+
+(send imginput get-argb-pixels 0 0 img-width img-height pixels)
+
+(define PixelsList (bytes->list pixels))
+
+```
+
+2. Convert RGB value to 24 bits
+* Input: RGB value
+* Output: one 24 bits values represent for RGB
+
+```racket
+;; Get to single list with 1 value represent for 1 pixel in the list
+(define (get-r lst) (cadr lst))
+(define (get-g lst) (caddr lst))
+(define (get-b lst) (cadddr lst))
+(define (remain-lst lst) (cddddr lst))
+
+;; using bitwise or/and with shift to store RGB value to 24 bits.
+(define (join-value red green blue)
+  (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
+  
+(define (RGBmap-iter result lst)
+  (if (null? lst)
+      result
+      (RGBmap-iter
+       (cons (join-value (get-r lst) (get-g lst) (get-b lst)) result)
+       (remain-lst lst))))
+
+
+(define RGBmap
+  (RGBmap-iter '() PixelsList))
+
+```
+
+3. Function help extract one 24 bits value to RGB
+* Input : 1 number
+* Output : RGB values
+
+```racket
+(define (extract-rgb num)
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))]
+    (list 255 red green blue)))
+    
+```
+
 
 ## Image:
 Input:
@@ -281,3 +334,6 @@ Main: Gather information needed for the project.
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
 [output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sample-output.png
 [diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Drawing.png
+[grayimage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/GrayImage.png
+[InvertImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertImage.png
+[BlurImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/BlurImage.png
