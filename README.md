@@ -376,7 +376,12 @@ We successfully to convert from the original image to pencil image.
 (define Color-Dodge-Blend-Merge
   (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
   ```
-  
+
+
+##Running Time:
+
+Algorithm 1: 77 seconds.
+Algorithm 2: 14 seconds.
   
 ## Image:
 Input:
