@@ -269,6 +269,19 @@ We successfully to convert from the original image to pencil image.
 ## Image:
 Input:
 ![alt text][input]
+
+BlurImage:
+![alt text][BlurImage]
+
+GrayImage:
+![alt text][grayimage]
+
+InvertImage:
+![alt text][InvertImage]
+
+InvertBlur:
+![alt text][InvertBlur]
+
 Output:
 ![alt text][output]
 
@@ -336,4 +349,5 @@ Main: Gather information needed for the project.
 [diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Drawing.png
 [grayimage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/GrayImage.png
 [InvertImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertImage.png
+[InvertBlur]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertBlur.png
 [BlurImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/BlurImage.png
