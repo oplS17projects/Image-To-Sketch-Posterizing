@@ -263,9 +263,111 @@ We successfully to convert from the original image to pencil image.
      (define blue (bitwise-bit-field num 16 24))]
     (list 255 red green blue)))
     
+    
 ```
 
+4. Convert to gray scale
+```racket
 
+(define (get-gray-value num)
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))
+     (define value (quotient (+ red green blue) 3))]
+    (join-value value value value)))
+  
+
+(define (gray-scale-helper result lst )
+  (if (null? lst)
+      result
+      (gray-scale-helper (cons (get-gray-value (car lst)) result) (cdr lst))))
+
+(define gray-scale
+  (gray-scale-helper '() RGBmap))
+```
+5.  Invert Colors from Gray Scale
+
+```racket
+
+(define (get-invert-value num)
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))]
+    (join-value (- 255 red) (- 255 green) (- 255 blue))))
+
+(define (invert-color result lst)
+  (if (null? lst)
+      result
+      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
+
+(define inverts-value
+  (invert-color '() gray-scale))
+```
+
+6. Apply Gaussian Blur to Inverted Color
+
+```racket
+;; By using the flomap library, apply the built-in function flomap-gaussian-blur
+;; to get the blur image
+
+(define InvertedBitmap (make-object bitmap% img-width img-height))
+
+(define InvertedList
+  (back-to-argb inverts-value))
+
+(send InvertedBitmap set-argb-pixels 0 0 img-width img-height (list->bytes (append* InvertedList)))
+
+;; convert it to flomap
+(define fm (bitmap->flomap InvertedBitmap))
+
+;; Make the gaussian blur
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 8) 2)))
+
+(send GblurImg get-argb-pixels 0 0 img-width img-height  pixels)
+
+(define BlurMap (bytes->list pixels))
+
+(define BlurValue
+  (RGBmap-iter '() BlurMap))
+```
+7. Color Dodge Blend Merge Function
+```racket
+;; Merge GrayList and BWRGBBlurList
+;; if numblur == 255 return numblur
+;; else return (numbw * 256) / (255 - numblur)
+
+(define (colordodge numblur numbw)
+  (if (equal? 255 numblur)
+      numblur
+      (min 255 (round (/ (* numbw 256) (- 255 numblur)))))) 
+
+(define (value-return blist glist)
+  (join-value (colordodge (get-r blist) (get-r glist))
+        (colordodge (get-g blist) (get-g glist))
+        (colordodge (get-b blist) (get-b glist))
+        ))
+
+(define (return-dodge num1 num2)
+  (local
+    [(define rgb1 (extract-rgb num1))
+     (define rgb2 (extract-rgb num2))]
+    (value-return rgb1 rgb2)))
+
+
+(define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
+  (if (null? blurlist)
+      result
+      (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
+                                    (cdr blurlist) (cdr bwlist))))
+
+
+(define Color-Dodge-Blend-Merge
+  (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
+  ```
+  
+  
 ## Image:
 Input:
 ![alt text][input]
