@@ -230,7 +230,7 @@ We may use Median Blur and redraw the image based on detect and enhance edges al
 
 ## Architecture Diagram
 
-![alt text][Drawing.png]
+![alt text][Drawing]
 
 1. Load the Input image
 2. Read every pixel of the Image which are the RGB value and store it into 2D list.
