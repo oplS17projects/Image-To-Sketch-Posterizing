@@ -1,6 +1,6 @@
 #lang racket
 ;; Version 0.3
-
+(define start-time (current-inexact-milliseconds))
 ;; Due to the time consumming, image with size less than 1024x800.
 ;; Idea:
 ;; 1. Read pixel from image
@@ -42,9 +42,9 @@
 
 (define PixelsList (bytes->list pixels))
 
-(define list-output (open-output-file "argb.txt" #:exists 'replace))
-(write PixelsList list-output)
-(close-output-port list-output)
+;(define list-output (open-output-file "argb.txt" #:exists 'replace))
+;(write PixelsList list-output)
+;(close-output-port list-output)
 
 ;; ============================
 ;; function extract number to red/green/blue value from binary
@@ -118,11 +118,6 @@
 (define (back-to-argb lst)
   (back-to-argb-iter '() lst))
 
-;(define out1 (open-output-file "RGBMap-return.txt" #:exists 'replace))
-;(write (back-to-argb gray-scale) out1)
-;(close-output-port out1)
-
-
 ;; ===============================
 ;; Invert Colors from Gray Scale
 
@@ -158,7 +153,7 @@
 (define fm (bitmap->flomap InvertedBitmap))
 
 ;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 2)))
+(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 8) 2)))
 
 (send GblurImg get-argb-pixels 0 0 img-width img-height  pixels)
 
@@ -200,29 +195,28 @@
 
 
 (define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter '() BlurValue gray-scale))
+  (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
   
 
-
+;(define out1 (open-output-file "BlurValue.txt" #:exists 'replace))
+;(write BlurValue out1)
+;(close-output-port out1)
   
   
 ;; ===============================
 ;; function convert back to bitmap (image)
 
-(define test (make-object bitmap% img-width img-height))
-
 (define finallist
   (back-to-argb Color-Dodge-Blend-Merge))
 
-(send test set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
-test
+(send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
 
+(send imginput save-file "Output.png" 'png)
 
-(define out (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
-(write Color-Dodge-Blend-Merge out)
-(close-output-port out)
+(define end-time (current-inexact-milliseconds))
 
-
+(display "Runtime: ")
+(round (/ (- end-time start-time) 1000))
 
 
 
