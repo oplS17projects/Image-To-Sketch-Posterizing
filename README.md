@@ -230,7 +230,7 @@ We may use Median Blur and redraw the image based on detect and enhance edges al
 
 ## Architecture Diagram
 
-![alt text][Drawing]
+![alt text][diagram]
 
 1. Load the Input image
 2. Read every pixel of the Image which are the RGB value and store it into 2D list.
@@ -280,4 +280,4 @@ Main: Gather information needed for the project.
 <!-- Links -->
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
 [output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sample-output.png
-[diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png
+[diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Drawing.png
