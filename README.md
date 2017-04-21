@@ -50,38 +50,32 @@ Output:
 ![alt text][posterized]
 
 
-### Function Detail
+## Functional Detail
 
-## Algorithm 1:
-1. Get pixel function
+### Algorithm 1:
+
+* Read pixels from image and store to RGBList
+
 ```racket
 ;; function get pixel at x and y
 ;; Local str is use to convert the color struct to string
 ;; Local str1 get the substring and split it into a list
 ;; finally, convert back the string to number go now I get RGB value number
-;; Note: We have to use this method because the get-pixel-color library is create the
-;; immunate struct which is can't change but We only need RGB value for calculation
-;; so We choice to write my own function to return the RGB from get-pixel-color.
+;; Note: I have to use this method because the get-pixel-color library is create the
+;; immunate struct which is can't change but I only need RGB value for calculation
+;; so I choice to write my own function to return the RGB from get-pixel-color.
 (define (get-pixel-helper x y img)
   (local
     [(define str (any->string (get-pixel-color y x img)))
      (define str1 (string-split (substring str 15 (- (string-length str) 1))))]
-    (list (string->number (list-ref str1 0)) (string->number (list-ref str1 1)) (string->number (list-ref str1 2)))))
-
+    (list (string->number (list-ref str1 0)) 
+			(string->number (list-ref str1 1)) 
+			(string->number (list-ref str1 2)))))
 ```
 
-2. Save to List
-```Racket
-;; Function to read each pixel and save to list
-(define (RGBList-iter width height img)
-  (for/list ([x (in-range 0 height)])
-    (for/list ([y (in-range 0 width)])
-           (get-pixel-helper x y img))))
-```
-
-3. Convert to gray scale
-* Input : RGB list
-* Output : Gray-List
+* Convert Color to Gray-Scale
+	The grayscale basically is the value of (Red + Green + Blue) / 3 for all R/G/B
+	
 ```Racket
 (define (gray-point-value lst)
   (local
@@ -98,15 +92,14 @@ Output:
   (GrayList-iter-value RGBList img-width img-height))
 ```
 
-4. Convert to Inverted Gray Image
-* Input: Gray-List
-* Output: InvertColor-List
+* From the grayscale, make an Inverted Color list
+	For each RGB in a pixel, we subtract from 255. This will make an inverted
 
 ```Racket
 
 (define (Invert-Value lst)
   (list (- 255 (list-ref lst 0)) (- 255 (list-ref lst 1)) (- 255(list-ref lst 2))))
-  
+
 (define (MakeInvert invertlist width height)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
@@ -114,34 +107,11 @@ Output:
       )))
 ```
 
-5. Apply Gaussian Blur
-* Input: InvertColor-List
-* Ouput: Blured-List
+* Apply Gaussian Blur into the Inverted Color list
+	Since the gaussian blur only the a flomap as an input for, we have to converted the Inverted Color to bitmap. From the bitmap, it can convert to flomap to do the gaussian blur.
 
 ```Racket
-
-;; Read image to bitmap% object
-(define dm (make-object bitmap% img-name))
-
-;; convert it to flomap
-(define fm (bitmap->flomap dm))
-
-;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
-
-;; Read RGB from blur image (color image)
-(define RGBBlurList
-  (RGBList-iter img-width img-height GblurImg))
-```
-
-
-6. Image Color Dodge Merge
-* Input: Blured-List && Gray-List
-* Output: Final Image
- 
- ```Racket
- ;; Apply Gaussian Blur to Inverted Color
-
+;; Convert Inverted Color to bitmap
 (define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
 
 ;; Save BWinvert image
@@ -157,11 +127,44 @@ Output:
 (define bwfm (bitmap->flomap bwdm))
 
 ;; Make the gaussian blur
-(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 12) 0)))
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 6) 2)))
 
 ;; Red RGB from blur image
 (define BWRGBBlurList
   (RGBList-iter img-width img-height bwGblurImg))
+```
+
+
+* Color Dodge Blend
+	This use to merger the gaussian blur and the grayscale together, the final result will be sketch.
+	
+ ```Racket
+;; Color Dodge Blend Merge Function
+;; Merge GrayList and BWRGBBlurList
+;; if numblur == 255 return numblur
+;; else return (numbw * 256) / (255 - numblur)
+
+(define (colordodge numblur numbw)
+  (if (equal? 255 numblur)
+      numblur
+      (min 255 (round (/ (* numbw 256) (- 255 numblur)))))) 
+
+(define (lst-bend blurlist bwlist)
+  (list (colordodge (list-ref blurlist 0) (list-ref bwlist 0))
+        (colordodge (list-ref blurlist 1) (list-ref bwlist 1))
+        (colordodge (list-ref blurlist 2) (list-ref bwlist 2))
+        ))
+  
+(define (Color-Dodge-Blend-Merge-iter blurlist bwlist width height)
+  (for/list ([x (in-range 0 height)])
+    (for/list ([y (in-range 0 width)])
+      (lst-bend (list-ref (list-ref blurlist x) y) (list-ref (list-ref bwlist x) y))
+      )))
+
+
+(define Color-Dodge-Blend-Merge
+  (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
+
  ```
  
 # Extra filter:

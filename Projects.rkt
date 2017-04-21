@@ -153,6 +153,7 @@
 ;; ==============================
 ;; 4. Apply Gaussian Blur to Inverted Color
 
+;; Convert Inverted Color to bitmap
 (define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
 
 ;; Save BWinvert image
