@@ -15,7 +15,7 @@ The idea of this project is using racket to perform a conversion of normal image
 A digital image is a contributed by millions pixel/dot. Each pixel is a color, and each color is the mixed of red green and blue (RGB). Our program is read the entire pixel from an image into a list (we can think of 2-dimension array or matrix x/y). Each value in the matrix is represent for a pixel value of the image. By that, we can change the color to anything we want and for this project, our goal it convert the image to stretch image.
 Our team try to use less the library of the racket, we implement new function base on the follow Architecture Diagram:
 
-![alt text][diagram]
+<p align="center"><img src="https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png" /></p>
 
 For this project, we have two different programs do to the same thing. Why? Because after we finished the first one, the runtime is too slow for convert so we rewrite the whole thing with differents algoritms so the running time is improved.
 
@@ -238,7 +238,9 @@ We successfully to convert from the image to sketch.
   (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
 ```
 
-![alt text][24bits]
+This is how we stored the RGB into 24 bits binary, which using bitwise and shift to the correct position in binary bits.
+
+<p align="center"><img src="https://github.com/oplS17projects/Image-To-Cartoon/blob/master/24bits.JPG" /></p>
 
 * Storing to list:
 	- By storing into a single list, the running time it O(n) to read and store.
