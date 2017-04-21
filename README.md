@@ -1,4 +1,4 @@
-# Sketch Posterizing
+# Image to Sketch / Posterizing
 
 ### Version: 1.0
 
@@ -463,7 +463,7 @@ Main: Gather information needed for the project.
 <!-- Links -->
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
 [output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sample-output.png
-[diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Drawing.png
+[diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png
 [grayimage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/GrayImage.png
 [InvertImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertImage.png
 [InvertBlur]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertBlur.png

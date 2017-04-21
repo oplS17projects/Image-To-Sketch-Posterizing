@@ -73,66 +73,6 @@
   (RGBList-iter img-width img-height imginput))
 
 
-;; ==============================
-;; Function for Posterize Filter Algorithm
-
-(define (round-num num-ori num-int)
-  (if (< (- num-ori num-int) 0.5)
-      (floor num-ori)
-      (ceiling num-ori)))
-
-
-(define (posterize-point lst numOfArea numOfValues)
-  (local
-    [(define redAreaFloat (/ (list-ref lst 0) numOfArea))
-     (define redArea (round-num redAreaFloat (floor redAreaFloat)))
-     (define greenAreaFloat (/ (list-ref lst 1) numOfArea))
-     (define greenArea (round-num greenAreaFloat (floor greenAreaFloat)))
-     (define blueAreaFloat (/ (list-ref lst 2) numOfArea))
-     (define blueArea (round-num blueAreaFloat (floor blueAreaFloat)))
-     (define newredfloat 0.0)
-     (define newgreengfloat 0.0)
-     (define newbluefloat 0.0)
-     (define newred 0)
-     (define newgreen 0)
-     (define newblue 0)]
-    
-    (cond
-      [(> redArea redAreaFloat)(set! redArea (- redArea 1))])
-    (set! newredfloat (* numOfValues redArea))
-    (set! newred (round-num newredfloat (floor newredfloat)))
-    (cond
-      [(> newred newredfloat)(set! newred (- newred 1))])
-
-
-    (cond
-      [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
-    (set! newgreengfloat (* numOfValues greenArea))
-    (set! newgreen (round-num newgreengfloat (floor newgreengfloat)))
-    (cond
-      [(> newgreen newgreengfloat)(set! newgreen (- newgreen 1))])
-    
-    (cond
-      [(> blueArea blueAreaFloat)(set! blueArea (- blueArea 1))])
-    (set! newbluefloat (* numOfValues blueArea))
-    (set! newblue (round-num newbluefloat (floor newbluefloat)))
-    (cond
-      [(> newblue newbluefloat)(set! newblue (- newblue 1))])
-    (list newred newgreen newblue)
-    
-    ))
-   
-
-(define (posterize data width height value)
-  (cond [(and (>= value 2) (<= value 255))
-      (local
-        [(define numOfAreas (/ 256 value))
-         (define numOfValues (/ 255 (- value 1)))]
-        (for/list ([x (in-range 0 height)])
-          (for/list ([y (in-range 0 width)])
-            (posterize-point (list-ref (list-ref data x) y) numOfAreas numOfValues)
-      )))]))
-
 
 ;; ==============================
 ;; Convert RGB Scale to GrayScale
@@ -199,24 +139,6 @@
   (MakeInvert GrayScale img-width img-height))
 
 
-;; ==============================
-;; Apply Gaussian Blur to Color bitmap
-;; By using the flomap library, apply the built-in function flomap-gaussian-blur
-;; to get the blur image
-
-;; Read image to bitmap% object
-(define dm (make-object bitmap% img-name))
-
-;; convert it to flomap
-(define fm (bitmap->flomap dm))
-
-;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 12) 3)))
-
-;; Read RGB from blur image (color image)
-(define RGBBlurList
-  (RGBList-iter img-width img-height GblurImg))
-
 ;;==============================
 ;; Main funtion start from here.
 ;;******************************
@@ -227,12 +149,9 @@
 ;; 3. Invert Colors from Gray Scale
 (define InvertColorList (InvertColor GrayList))
 
-;; 4. Apply Gaussian Blur to Inverted Color
-(define GBlurList RGBBlurList)
-
 
 ;; ==============================
-;; Apply Gaussian Blur to Inverted Color
+;; 4. Apply Gaussian Blur to Inverted Color
 
 (define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
 
@@ -249,7 +168,7 @@
 (define bwfm (bitmap->flomap bwdm))
 
 ;; Make the gaussian blur
-(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 12) 0)))
+(define bwGblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset bwfm 6) 2)))
 
 ;; Red RGB from blur image
 (define BWRGBBlurList
@@ -283,24 +202,72 @@
 (define Color-Dodge-Blend-Merge
   (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
 
-;;(define out3 (open-output-file "Color-Dodge-Blend-Merge.txt" #:exists 'replace))
-;;(write Color-Dodge-Blend-Merge out3)
-;;(close-output-port out3)
 
 
+;; ==============================
+;; Function for Posterize Filter Algorithm
+
+(define (round-num num-ori num-int)
+  (if (< (- num-ori num-int) 0.5)
+      (floor num-ori)
+      (ceiling num-ori)))
 
 
+(define (posterize-point lst numOfArea numOfValues)
+  (local
+    [(define redAreaFloat (/ (list-ref lst 0) numOfArea))
+     (define redArea (round-num redAreaFloat (floor redAreaFloat)))
+     (define greenAreaFloat (/ (list-ref lst 1) numOfArea))
+     (define greenArea (round-num greenAreaFloat (floor greenAreaFloat)))
+     (define blueAreaFloat (/ (list-ref lst 2) numOfArea))
+     (define blueArea (round-num blueAreaFloat (floor blueAreaFloat)))
+     (define newredfloat 0.0)
+     (define newgreengfloat 0.0)
+     (define newbluefloat 0.0)
+     (define newred 0)
+     (define newgreen 0)
+     (define newblue 0)]
+    
+    (cond
+      [(> redArea redAreaFloat)(set! redArea (- redArea 1))])
+    (set! newredfloat (* numOfValues redArea))
+    (set! newred (round-num newredfloat (floor newredfloat)))
+    (cond
+      [(> newred newredfloat)(set! newred (- newred 1))])
 
 
+    (cond
+      [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
+    (set! newgreengfloat (* numOfValues greenArea))
+    (set! newgreen (round-num newgreengfloat (floor newgreengfloat)))
+    (cond
+      [(> newgreen newgreengfloat)(set! newgreen (- newgreen 1))])
+    
+    (cond
+      [(> blueArea blueAreaFloat)(set! blueArea (- blueArea 1))])
+    (set! newbluefloat (* numOfValues blueArea))
+    (set! newblue (round-num newbluefloat (floor newbluefloat)))
+    (cond
+      [(> newblue newbluefloat)(set! newblue (- newblue 1))])
+    (list newred newgreen newblue)
+    
+    ))
+   
 
-;;=============================
-;; Duy
-;;Create Posterize list
+(define (posterize data width height value)
+  (cond [(and (>= value 2) (<= value 255))
+      (local
+        [(define numOfAreas (/ 256 value))
+         (define numOfValues (/ 255 (- value 1)))]
+        (for/list ([x (in-range 0 height)])
+          (for/list ([y (in-range 0 width)])
+            (posterize-point (list-ref (list-ref data x) y) numOfAreas numOfValues)
+      )))]))
 
-;(define posterizeValue 20)
+(define posterizeValue 20)
 
-;(define PosterizingFilterList
-;  (posterize GBlurList img-width img-height posterizeValue))
+(define PosterizingFilterList
+  (posterize RGBList img-width img-height posterizeValue))
 
 ;;(define out3 (open-output-file "PosterizeList.txt" #:exists 'replace))
 ;;(write PosterizeList out3)
@@ -329,9 +296,9 @@
 ;(color-list->bitmap FinalGBlurList img-width img-height)
 
 ;; Create Single Posterize List
-;;(define FinalPosterizeList
-;;  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
-;(color-list->bitmap FinalGrayList img-width img-height)
+;(define FinalPosterizeList
+;  (join-list PosterizingFilterList 0 (length PosterizingFilterList) null))
+;(color-list->bitmap FinalPosterizeList img-width img-height)
 
 ;; Create Single Inverted Blur List
 ;(define FinalInvertedBlurList
@@ -347,7 +314,7 @@
 
 ;;==============================
 (define save-photo
-  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sketch.png"))
+  (save-image (color-list->bitmap FinalSketch img-width img-height) "Sketch-Algorithm1.png"))
 
 
 
