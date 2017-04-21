@@ -74,7 +74,7 @@ Output:
 ```
 
 * Convert Color to Gray-Scale
-	The grayscale basically is the value of (Red + Green + Blue) / 3 for all R/G/B
+	- The grayscale basically is the value of (Red + Green + Blue) / 3 for all R/G/B
 	
 ```Racket
 (define (gray-point-value lst)
@@ -93,7 +93,7 @@ Output:
 ```
 
 * From the grayscale, make an Inverted Color list
-	For each RGB in a pixel, we subtract from 255. This will make an inverted
+	- For each RGB in a pixel, we subtract from 255. This will make an inverted
 
 ```Racket
 
@@ -108,7 +108,7 @@ Output:
 ```
 
 * Apply Gaussian Blur into the Inverted Color list
-	Since the gaussian blur only the a flomap as an input for, we have to converted the Inverted Color to bitmap. From the bitmap, it can convert to flomap to do the gaussian blur.
+	- Since the gaussian blur only the a flomap as an input for, we have to converted the Inverted Color to bitmap. From the bitmap, it can convert to flomap to do the gaussian blur.
 
 ```Racket
 ;; Convert Inverted Color to bitmap
@@ -160,7 +160,6 @@ Output:
     (for/list ([y (in-range 0 width)])
       (lst-bend (list-ref (list-ref blurlist x) y) (list-ref (list-ref bwlist x) y))
       )))
-
 
 (define Color-Dodge-Blend-Merge
   (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
