@@ -28,7 +28,6 @@
 (define (remain-lst lst) (cddddr lst))
 
 
-
 ;; function extract number to red/green/blue value from binary
 (define (extract-rgb num)
   (local
@@ -230,13 +229,6 @@
 
 (send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
 (send imginput save-file "Sketch.png" 'png)
-
-
-(define finallist1
-  (back-to-argb BlurValue))
-
-(send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist1)))
-(send imginput save-file "InvertedBlur.png" 'png)
 
 ;; ===============================
 ;; calcuate the running time of the program

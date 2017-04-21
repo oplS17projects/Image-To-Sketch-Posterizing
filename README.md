@@ -42,13 +42,6 @@ For this project, we have two different programs do to the same thing. Why? Beca
 ### Deliverable and Demonstration
 We successfully to convert from the image to sketch.
 
-Output:
-![alt text][sketch]
-
-And also an extra posterized image
-Output:
-![alt text][posterized]
-
 
 ## Functional Detail
 
@@ -112,7 +105,9 @@ Output:
 
 ```Racket
 ;; Convert Inverted Color to bitmap
-(define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
+(define BWimage 
+	(color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) 
+						img-width img-height))
 
 ;; Save BWinvert image
 (define save-temp (save-image BWimage "temp.png"))
@@ -134,9 +129,8 @@ Output:
   (RGBList-iter img-width img-height bwGblurImg))
 ```
 
-
 * Color Dodge Blend
-	This use to merger the gaussian blur and the grayscale together, the final result will be sketch.
+	- This use to merger the gaussian blur and the grayscale together, the final result will be sketch.
 	
  ```Racket
 ;; Color Dodge Blend Merge Function
@@ -166,17 +160,13 @@ Output:
 
  ```
  
-# Extra filter:
-* Posterizing:
+* Extra filter: Posterizing
 ```Racket
-
 ;; Function for Posterize Filter Algorithm
-
 (define (round-num num-ori num-int)
   (if (< (- num-ori num-int) 0.5)
       (floor num-ori)
       (ceiling num-ori)))
-
 
 (define (posterize-point lst numOfArea numOfValues)
   (local
@@ -200,7 +190,6 @@ Output:
     (cond
       [(> newred newredfloat)(set! newred (- newred 1))])
 
-
     (cond
       [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
     (set! newgreengfloat (* numOfValues greenArea))
@@ -218,7 +207,6 @@ Output:
     
     ))
    
-
 (define (posterize data width height value)
   (cond [(and (>= value 2) (<= value 255))
       (local
@@ -230,38 +218,34 @@ Output:
       )))]))
 ```
 
-## Algorithm 2:
+### Algorithm 2:
 
-1. Get pixels value
-* Input: Image
-* Output: List of RGB value
-```racket 
+* The steps is pretty much the same as the algorithm 1, but the way we read and store RGB is totaly different.
 
-;; Read image to bitmap% object
-
-(define pixels (make-bytes (* img-height img-width 4)))
-
-(send imginput get-argb-pixels 0 0 img-width img-height pixels)
-
-(define PixelsList (bytes->list pixels))
-
-```
-
-2. Convert RGB value to 24 bits
-* Input: RGB value
-* Output: one 24 bits values represent for RGB
+* We read and store the RGB value into 24bits binary. By doing this, it save a lot memory and also decrease the reading time from the list.
 
 ```racket
-;; Get to single list with 1 value represent for 1 pixel in the list
-(define (get-r lst) (cadr lst))
-(define (get-g lst) (caddr lst))
-(define (get-b lst) (cadddr lst))
-(define (remain-lst lst) (cddddr lst))
+;; function extract number to red/green/blue value from binary
+(define (extract-rgb num)
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))]
+    (list 255 red green blue)))
 
-;; using bitwise or/and with shift to store RGB value to 24 bits.
+;; this function store r/g/b to 24bits memory by using bitwise or/and with shift operators
 (define (join-value red green blue)
   (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
-  
+```
+
+![alt text][24bits]
+
+* Storing to list:
+	- By storing into a single list, the running time it O(n) to read and store.
+
+```racket
+;; This function read red/green/blue from PixelsList, then convert it to 24bits binays
+;; then return a single list of 24bits integer
 (define (RGBmap-iter result lst)
   (if (null? lst)
       result
@@ -269,177 +253,40 @@ Output:
        (cons (join-value (get-r lst) (get-g lst) (get-b lst)) result)
        (remain-lst lst))))
 
-
 (define RGBmap
   (RGBmap-iter '() PixelsList))
-
 ```
-
-3. Function help extract one 24 bits value to RGB
-* Input : 1 number
-* Output : RGB values
-
-```racket
-(define (extract-rgb num)
-  (local
-    [(define red (bitwise-bit-field num 0 8))
-     (define green (bitwise-bit-field num 8 16))
-     (define blue (bitwise-bit-field num 16 24))]
-    (list 255 red green blue)))
-    
-    
-```
-
-4. Convert to gray scale
-* Input: Number
-* Output:  24bits Gray Number 
-
-```racket
-
-(define (get-gray-value num)
-  (local
-    [(define red (bitwise-bit-field num 0 8))
-     (define green (bitwise-bit-field num 8 16))
-     (define blue (bitwise-bit-field num 16 24))
-     (define value (quotient (+ red green blue) 3))]
-    (join-value value value value)))
-  
-
-(define (gray-scale-helper result lst )
-  (if (null? lst)
-      result
-      (gray-scale-helper (cons (get-gray-value (car lst)) result) (cdr lst))))
-
-(define gray-scale
-  (gray-scale-helper '() RGBmap))
-```
-5.  Invert Colors from Gray Scale
-* Input: Gray Number 
-* Output:  24bits Invert Number 
-
-```racket
-
-(define (get-invert-value num)
-  (local
-    [(define red (bitwise-bit-field num 0 8))
-     (define green (bitwise-bit-field num 8 16))
-     (define blue (bitwise-bit-field num 16 24))]
-    (join-value (- 255 red) (- 255 green) (- 255 blue))))
-
-(define (invert-color result lst)
-  (if (null? lst)
-      result
-      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
-
-(define inverts-value
-  (invert-color '() gray-scale))
-```
-
-6. Apply Gaussian Blur to Inverted Color
-* Input: Invert Number 
-* Output:  24bits Blur Invert Number 
-
-```racket
-;; By using the flomap library, apply the built-in function flomap-gaussian-blur
-;; to get the blur image
-
-(define InvertedBitmap (make-object bitmap% img-width img-height))
-
-(define InvertedList
-  (back-to-argb inverts-value))
-
-(send InvertedBitmap set-argb-pixels 0 0 img-width img-height (list->bytes (append* InvertedList)))
-
-;; convert it to flomap
-(define fm (bitmap->flomap InvertedBitmap))
-
-;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 8) 2)))
-
-(send GblurImg get-argb-pixels 0 0 img-width img-height  pixels)
-
-(define BlurMap (bytes->list pixels))
-
-(define BlurValue
-  (RGBmap-iter '() BlurMap))
-```
-7. Color Dodge Blend Merge Function
-* Input: Invert Blur Number and Gray value 
-* Output:  final image value
-
-```racket
-;; Merge GrayList and BWRGBBlurList
-;; if numblur == 255 return numblur
-;; else return (numbw * 256) / (255 - numblur)
-
-(define (colordodge numblur numbw)
-  (if (equal? 255 numblur)
-      numblur
-      (min 255 (round (/ (* numbw 256) (- 255 numblur)))))) 
-
-(define (value-return blist glist)
-  (join-value (colordodge (get-r blist) (get-r glist))
-        (colordodge (get-g blist) (get-g glist))
-        (colordodge (get-b blist) (get-b glist))
-        ))
-
-(define (return-dodge num1 num2)
-  (local
-    [(define rgb1 (extract-rgb num1))
-     (define rgb2 (extract-rgb num2))]
-    (value-return rgb1 rgb2)))
+* So after we stored to the 24 bits binary, the list of pixels now is only a single list. It helps read faster than the algoirthm 1 which is list inside a list. Example of 24 bits binary for RGB in the list: `'(16777215 16777215 16777215 8026746 6842472.....)`
 
 
-(define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
-  (if (null? blurlist)
-      result
-      (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
-                                    (cdr blurlist) (cdr bwlist))))
+## Running Time:
 
-
-(define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
-  ```
-
-
-##Running Time:
-
-Algorithm 1: 77 seconds.
-Algorithm 2: 14 seconds.
+* The running time to convert a 1024x629 image to sketch is:
+- Algorithm 1: 56 seconds.
+- Algorithm 2: 9 seconds.
   
 ## Image:
+Steps:
+![alt text][steps]
+
 Input:
 ![alt text][input]
 
-BlurImage:
-![alt text][BlurImage]
-
-GrayImage:
+GrayScale:
 ![alt text][grayimage]
 
-InvertImage:
+InvertedImage:
 ![alt text][InvertImage]
 
-InvertBlur:
+InvertedBlur:
 ![alt text][InvertBlur]
 
+Final Output:
+![alt text][sketch]
 
-### Evaluation of Results
-We are almost there, we are now searching for a good algorithm that do a filter, which it use to combine this filter and BW to create a new image.
-
-* The BW image is very simple, it is made from gray value and gray value is the mean of RGB values.
-* Filter, we are searching for a good algorithm now. There are many image’s filter such as Median Blur, Bilateral filter, Min filter. 
-
-We may use Median Blur and redraw the image based on detect and enhance edges algorithm to create a new image.
-
-
-
-1. Load the Input image
-2. Read every pixel of the Image which are the RGB value and store it into 2D list.
-3. Calculate gray values
-4. Create filter
-5. Combine gray values and filter
-6. Create new image 
+And also an extra posterized image
+Output:
+![alt text][posterized]
 
 
 ## Schedule
@@ -456,9 +303,9 @@ We both will work on Gaussian Blur Filter. After that we will combine the filter
 
 At this point, we use another two racket library with is `(require images/flomap)` and `(require (except-in racket/draw make-pen make-color)).` to make a `flomap` for generate the Gaussian Blur filter.
 
-### Public Presentation (Mon Apr 24, Wed Apr 26, or Fri Apr 28 [your date to be determined later])
-- [ ] 
-Wrap up everything, all bugs should be addressed. Clean up the code and ready to demonstrate.
+### Public Presentation (Fri Apr 28)
+- [x] Rewrite the everything with new algoirthm to improved the running time
+- [x] Wrap up everything, all bugs should be addressed. Clean up the code and ready to demonstrate.
 
 ## Group Responsibilities
 
@@ -468,7 +315,9 @@ Main: Clean up, QA for program
 - [x] Merge the data from 2D list into single List
 - [x] Merge gray and filter to 2D list
 - [x] Work on filter
-- [ ] Addressed all bugs before demonstrate.
+- [x] Work on Inverted/Blur image (new algorithm)
+- [x] Work on color-dodge-blend (new algorithm)
+- [x] Addressed all bugs before demonstrate.
 
 ### Chuong Vu @vdc1703
 Main: Gather information needed for the project.
@@ -476,15 +325,18 @@ Main: Gather information needed for the project.
 - [x] Calculate gray values into new 2D list
 - [x] Work on filter
 - [x] Convert new 2D list to a new image
-- [ ] Clean up the code, ready to demonstrate
-
+- [x] Read/extract pixels in 24 bits binary (new algorithm)
+- [x] Convert result to image
+- [x] Clean up the code, ready to demonstrate
 
 <!-- Links -->
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
 [sketch]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sketch.png
 [posterized]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Posterized.png
+[24bits]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/24bits.JPG
+[steps]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/ConvertSteps.png
 [diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png
 [grayimage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/GrayImage.png
 [InvertImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertImage.png
-[InvertBlur]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertBlur.png
-[BlurImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/BlurImage.png
+[InvertedBlur]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertedBlur.png
+
