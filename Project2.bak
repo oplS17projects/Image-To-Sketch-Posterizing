@@ -1,5 +1,7 @@
 #lang racket
 ;; Version 0.3
+;; This is the new algorithm use to convert image to sketch with the impoved of running time
+
 (define start-time (current-inexact-milliseconds))
 ;; Due to the time consumming, image with size less than 1024x800.
 ;; Idea:
@@ -16,37 +18,21 @@
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
+
 (define img-name "house.jpg")
 
-;(define path (string-append (path->string (current-directory)) img-name))
+;; ==============================================
+;; Based functions
+;; ==============================================
 
-;; read the image
-;(define imginput (bitmap "house.jpg"))
-(define imginput (make-object bitmap% img-name))
-
-;; get image height
-;(define img-height (- (image-height imginput) 1))
-(define img-height (- (send imginput get-height) 1))
-
-;; get image width
-;(define img-width (- (image-width imginput) 1))
-(define img-width (- (send imginput get-width) 1))
+;; Get to single list with 1 value represent for 1 pixel in the list
+(define (get-r lst) (cadr lst))
+(define (get-g lst) (caddr lst))
+(define (get-b lst) (cadddr lst))
+(define (remain-lst lst) (cddddr lst))
 
 
-;; =============================
-;; Read image to bitmap% object
 
-(define pixels (make-bytes (* img-height img-width 4)))
-
-(send imginput get-argb-pixels 0 0 img-width img-height pixels)
-
-(define PixelsList (bytes->list pixels))
-
-;(define list-output (open-output-file "argb.txt" #:exists 'replace))
-;(write PixelsList list-output)
-;(close-output-port list-output)
-
-;; ============================
 ;; function extract number to red/green/blue value from binary
 (define (extract-rgb num)
   (local
@@ -55,17 +41,65 @@
      (define blue (bitwise-bit-field num 16 24))]
     (list 255 red green blue)))
 
-;; ============================
-;; Get to single list with 1 value represent for 1 pixel in the list
-(define (get-r lst) (cadr lst))
-(define (get-g lst) (caddr lst))
-(define (get-b lst) (cadddr lst))
-(define (remain-lst lst) (cddddr lst))
-
-;; using bitwise or/and with shift to store RGB value to 24 bits.
+;; this function store r/g/b to 24bits memory by using bitwise or/and with shift operators
 (define (join-value red green blue)
   (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
   
+        
+;; Function convert back to ARGB list from list of 24bits values
+(define (back-to-argb-iter result lst)
+  (if (null? lst)
+      result
+      (back-to-argb-iter (cons (extract-rgb (car lst)) result) (cdr lst))))
+
+(define (back-to-argb lst)
+  (back-to-argb-iter '() lst))
+
+
+;; ===============================
+;; Posterize Function
+
+(define levels 20)
+
+(define (posterizeColor color)
+  (if (>= color 128) 255 0))
+
+(define (postvalue r g b)
+    (join-value (posterizeColor r) (posterizeColor g) (posterizeColor b)))
+
+
+(define (posterize color)
+  (local
+    [(define argb (extract-rgb color))
+     (define red (get-r argb))
+     (define green (get-g argb))
+     (define blue (get-b argb))]
+    (postvalue red green blue)))
+
+
+;; =============================
+;; Read image to bitmap% object
+
+(define imginput (make-object bitmap% img-name))
+
+;; get image height
+(define img-height (- (send imginput get-height) 1))
+
+;; get image width
+(define img-width (- (send imginput get-width) 1))
+
+;; allocate the memoery for pixels
+(define pixels (make-bytes (* img-height img-width 4)))
+
+;; read the argb value and store to pixels
+(send imginput get-argb-pixels 0 0 img-width img-height pixels)
+
+;; convert pixels to list for calcualte
+(define PixelsList (bytes->list pixels))
+
+;; ============================
+;; This function read red/green/blue from PixelsList, then convert it to 24bits binays
+;; then return a single list of 24bits integer
 (define (RGBmap-iter result lst)
   (if (null? lst)
       result
@@ -73,19 +107,15 @@
        (cons (join-value (get-r lst) (get-g lst) (get-b lst)) result)
        (remain-lst lst))))
 
-
 (define RGBmap
   (RGBmap-iter '() PixelsList))
 
 
-
-;(define out (open-output-file "RGBmap.txt" #:exists 'replace))
-;(write RGBmap out)
-;(close-output-port out)
-
-
 ;; ===========================
-;; Convert to gray scale
+;; Convert to gray scale from RGBMap
+
+;; extract r/g/b, then return value = (r + g + b) / 3
+;; then use join-value to convert back to 24 bits binary
 (define (get-gray-value num)
   (local
     [(define red (bitwise-bit-field num 0 8))
@@ -93,7 +123,7 @@
      (define blue (bitwise-bit-field num 16 24))
      (define value (quotient (+ red green blue) 3))]
     (join-value value value value)))
-  
+
 
 (define (gray-scale-helper result lst )
   (if (null? lst)
@@ -103,20 +133,7 @@
 (define gray-scale
   (gray-scale-helper '() RGBmap))
 
-;(define out1 (open-output-file "grayscale.txt" #:exists 'replace))
-;(write gray-scale out1)
-;(close-output-port out1)
-        
-;; =================================
-;; Function convert back to ARGB list
 
-(define (back-to-argb-iter result lst)
-  (if (null? lst)
-      result
-      (back-to-argb-iter (cons (extract-rgb (car lst)) result) (cdr lst))))
-
-(define (back-to-argb lst)
-  (back-to-argb-iter '() lst))
 
 ;; ===============================
 ;; Invert Colors from Gray Scale
@@ -142,21 +159,22 @@
 ;; By using the flomap library, apply the built-in function flomap-gaussian-blur
 ;; to get the blur image
 
-(define InvertedBitmap (make-object bitmap% img-width img-height))
-
+;; Convert invertes value back to argb
 (define InvertedList
   (back-to-argb inverts-value))
 
-(send InvertedBitmap set-argb-pixels 0 0 img-width img-height (list->bytes (append* InvertedList)))
+;; apply the new pixels to bitmap% object
+(send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* InvertedList)))
 
-;; convert it to flomap
-(define fm (bitmap->flomap InvertedBitmap))
+;; convert it to flomap from the bitmap
+(define fm (bitmap->flomap imginput))
 
-;; Make the gaussian blur
-(define GblurImg (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 8) 2)))
+;; apply the gaussian blur to the flopmap and also convert it back to the bitmap
+;; now read the new argb from the blur
+;; I mixed all the code togeter because I want to saved the memory so I dont have to make multiples object for bitmaps and pixels
+(send (flomap->bitmap (flomap-gaussian-blur (flomap-inset fm 6) 2)) get-argb-pixels 0 0 img-width img-height pixels)
 
-(send GblurImg get-argb-pixels 0 0 img-width img-height  pixels)
-
+;;from pixels list, convert it to list for futher calcualte
 (define BlurMap (bytes->list pixels))
 
 (define BlurValue
@@ -196,13 +214,18 @@
 
 (define Color-Dodge-Blend-Merge
   (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
-  
 
-;(define out1 (open-output-file "BlurValue.txt" #:exists 'replace))
-;(write BlurValue out1)
-;(close-output-port out1)
-  
-  
+
+;; ===============================
+;; Poterized image
+(define Posterized (map (lambda (number) (posterize number)) RGBmap))
+
+(define image
+  (back-to-argb Posterized))
+
+(send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* image)))
+(send imginput save-file "Posterized.png" 'png)
+
 ;; ===============================
 ;; function convert back to bitmap (image)
 
@@ -210,33 +233,18 @@
   (back-to-argb Color-Dodge-Blend-Merge))
 
 (send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
+(send imginput save-file "Sketch.png" 'png)
 
-(send imginput save-file "Output.png" 'png)
 
+;; ===============================
+;; calcuate the running time of the program
 (define end-time (current-inexact-milliseconds))
 
-(display "Runtime: ")
+(display "Runtime in seconds: ")
 (round (/ (- end-time start-time) 1000))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;;(define out (open-output-file "PixelsList.txt" #:exists 'replace))
+;;(write PixelsList out)
+;;(close-output-port out)

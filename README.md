@@ -5,28 +5,50 @@
 ### Team Member:
 + Duy Truong
 + Chuong Vu
-### Overview
 
-For Pencil Posterrizing Poject, our team used racket language to edit and create a new image from the original image. We have a lot different ways to convert (cartoon, gray, sketch). Our team focus on Sketch posterizing. However, Our team also implement some extra filters can help the user can convert to different type of image. we used 2 different algorithms to convert the image.
-1. Using the bitmap
-2. Read the bitmap and convert value of RGB to 1 24 bits values.
+### Statement
+
+The idea of this project is using racket to perform a conversion of normal image into sketch image. We both have never done image edit before we find it this project is really interesting how other programs such as Adobe Photoshop can be a powerful image-editing software.
 
 ### Analysis
-An digital image is a contributed by millions pixel/dot. And each pixel is contain 3 values Reg/Green/Blue (RGB) and these value make a color. Our program is load every pixel (RGB) into a list of list (or we can say 2-dimension array or matrix x/y). The pixel in the matrix is represent each dot on the image so it help us easily keep track the color at the position x/y. By that, we can can change the color to anything we want and for this project, our goal it convert the image to cartoon/stretch image.
-Our team try to use less the library of the racket, we implement new function base on the following algorithm:
-* Invert Image
-* Gray Scale
-* Color Image Dodge Merge
-* Poterzing Image
+
+A digital image is a contributed by millions pixel/dot. Each pixel is a color, and each color is the mixed of red green and blue (RGB). Our program is read the entire pixel from an image into a list (we can think of 2-dimension array or matrix x/y). Each value in the matrix is represent for a pixel value of the image. By that, we can change the color to anything we want and for this project, our goal it convert the image to stretch image.
+Our team try to use less the library of the racket, we implement new function base on the follow Architecture Diagram:
+
+![alt text][diagram]
+
+For this project, we have two different programs do to the same thing. Why? Because after we finished the first one, the runtime is too slow for convert so we rewrite the whole thing with differents algoritms so the running time is improved.
 
 ### Library
-For the libary of the racket, Our team use only two library to edit the image.
-* String - Using Sting libary to read and store the pixel of the image
-* flomap - to make a `flomap` for generate the Gaussian Blur filter.
-* draw make-pen make-color - support bitmap% different type object of bitmap. To convert from bitmap to flomap
+
+#### For the first algorithm (Algoirthm-1), we use:
+```racket
+(require (except-in picturing-programs)) ;; use to read the pixel and convert back to image
+(require racket/string)	;; convert anything to string
+
+;; This library is use for do the gaussian blur
+(require images/flomap)
+(require (except-in racket/draw make-pen make-color))
+```
+#### For the second algorithm (Algoirthm-2), we use:
+
+```racket
+;; This library is use for do the gaussian blur
+(require images/flomap)
+(require (except-in racket/draw make-pen make-color))
+```
+
 
 ### Deliverable and Demonstration
-We successfully to convert from the original image to pencil image.
+We successfully to convert from the image to sketch.
+
+Output:
+![alt text][sketch]
+
+And also an extra posterized image
+Output:
+![alt text][posterized]
+
 
 ### Function Detail
 
@@ -399,8 +421,6 @@ InvertImage:
 InvertBlur:
 ![alt text][InvertBlur]
 
-Output:
-![alt text][output]
 
 ### Evaluation of Results
 We are almost there, we are now searching for a good algorithm that do a filter, which it use to combine this filter and BW to create a new image.
@@ -411,9 +431,6 @@ We are almost there, we are now searching for a good algorithm that do a filter,
 We may use Median Blur and redraw the image based on detect and enhance edges algorithm to create a new image.
 
 
-## Architecture Diagram
-
-![alt text][diagram]
 
 1. Load the Input image
 2. Read every pixel of the Image which are the RGB value and store it into 2D list.
@@ -462,7 +479,8 @@ Main: Gather information needed for the project.
 
 <!-- Links -->
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
-[output]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sample-output.png
+[sketch]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sketch.png
+[posterized]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Posterized.png
 [diagram]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png
 [grayimage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/GrayImage.png
 [InvertImage]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/InvertImage.png

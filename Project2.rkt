@@ -11,10 +11,6 @@
 ;; 4. Apply Gaussian Blur to Inverted Color
 ;; 5. Merge 2 and 4 to get a sketch image
 
-; for get-pixel-color
-;(require (except-in picturing-programs))
-(require racket/string)
-
 ;; This library is use for do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
@@ -235,6 +231,12 @@
 (send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
 (send imginput save-file "Sketch.png" 'png)
 
+
+(define finallist1
+  (back-to-argb BlurValue))
+
+(send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist1)))
+(send imginput save-file "InvertedBlur.png" 'png)
 
 ;; ===============================
 ;; calcuate the running time of the program
