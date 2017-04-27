@@ -281,7 +281,7 @@ InvertedImage:
 ![alt text][InvertImage]
 
 InvertedBlur:
-![alt text][InvertBlur]
+![alt text][InvertedBlur]
 
 Final Output:
 ![alt text][sketch]
