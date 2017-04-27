@@ -123,8 +123,10 @@ Last step before convert all pixel back to bitmap%. The color dodge is use to co
 
 The method use it really simple, from each pixel of blur and gray-scale, extract the RGB value. For 3 RGB value, I use the same method is:
 
-``if blur_value == 255 return blur_value
-else return (gray-scale_value * 256) / (255 - blur_value)``
+``
+if blur_value == 255 return blur_value
+else return (gray-scale_value * 256) / (255 - blur_value)
+``
 
 and this applied to each red, green, and blue color. Then recombine them by join-value functions as above. At this point, all the values in the new list Color-Dodge-Blend-Merge will be convert to bitmap% and it is sketch image. Final result.
 
