@@ -1,5 +1,6 @@
 #lang racket
-;; Version 0.3
+;; Version 1.0
+;; Projects.rkt
 (define start-time (current-inexact-milliseconds))
 
 ;; Due to the time consumming, image with size less than 1024x800.
@@ -67,12 +68,9 @@
 ;;(write RGBList out)
 ;;(close-output-port out)
 
-
 ;; 1. Read pixel from image
 (define RGBList
   (RGBList-iter img-width img-height imginput))
-
-
 
 ;; ==============================
 ;; Convert RGB Scale to GrayScale
@@ -90,7 +88,6 @@
 
 (define MakeGrayList
   (GrayList-iter-value RGBList img-width img-height))
-
 
 ;;==============================
 ;; Join list
@@ -119,7 +116,6 @@
     (append* ResultList)))
   ;(join-list-next ResultList count max result)))
 
-
 ;; ==============================
 ;; Function to Inverted Color from Gray Scale
 ;; The inverted color basically just subtract individual R/G/B from 255 for each pixel
@@ -138,7 +134,6 @@
 (define(InvertColor GrayScale)
   (MakeInvert GrayScale img-width img-height))
 
-
 ;;==============================
 ;; Main funtion start from here.
 ;;******************************
@@ -148,7 +143,6 @@
 
 ;; 3. Invert Colors from Gray Scale
 (define InvertColorList (InvertColor GrayList))
-
 
 ;; ==============================
 ;; 4. Apply Gaussian Blur to Inverted Color
@@ -175,7 +169,6 @@
 (define BWRGBBlurList
   (RGBList-iter img-width img-height bwGblurImg))
 
-
 ;;=============================
 ;; Color Dodge Blend Merge Function
 ;; Merge GrayList and BWRGBBlurList
@@ -199,11 +192,8 @@
       (lst-bend (list-ref (list-ref blurlist x) y) (list-ref (list-ref bwlist x) y))
       )))
 
-
 (define Color-Dodge-Blend-Merge
   (Color-Dodge-Blend-Merge-iter BWRGBBlurList GrayList img-width img-height))
-
-
 
 ;; ==============================
 ;; Function for Posterize Filter Algorithm
@@ -212,7 +202,6 @@
   (if (< (- num-ori num-int) 0.5)
       (floor num-ori)
       (ceiling num-ori)))
-
 
 (define (posterize-point lst numOfArea numOfValues)
   (local
@@ -235,8 +224,7 @@
     (set! newred (round-num newredfloat (floor newredfloat)))
     (cond
       [(> newred newredfloat)(set! newred (- newred 1))])
-
-
+	  
     (cond
       [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
     (set! newgreengfloat (* numOfValues greenArea))
@@ -254,7 +242,6 @@
     
     ))
    
-
 (define (posterize data width height value)
   (cond [(and (>= value 2) (<= value 255))
       (local
@@ -274,7 +261,6 @@
 ;;(write PosterizeList out3)
 ;;(close-output-port out3)
 
-
 ;;==============================
 ;; Join to single list before convert to bitmap
 ;; Convert to make-color object from list
@@ -289,7 +275,6 @@
 ;(define FinalInvertColorList
 ;  (join-list InvertColorList 0 (length InvertColorList) null))
 ;(color-list->bitmap FinalInvertColorList img-width img-height)
-
 
 ;; Create Single Guassian Blur List
 ;(define FinalGBlurList
@@ -311,16 +296,9 @@
   (join-list Color-Dodge-Blend-Merge 0 (length Color-Dodge-Blend-Merge) null))
 ;(color-list->bitmap FinalSketch img-width img-height)
 
-
-
 ;;==============================
 (define save-photo
   (save-image (color-list->bitmap FinalSketch img-width img-height) "Sketch-Algorithm1.png"))
-
-
-
-
-
 
 (define end-time (current-inexact-milliseconds))
 

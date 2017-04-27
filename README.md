@@ -8,16 +8,17 @@
 
 ### Statement
 
-The idea of this project is using racket to perform a conversion of normal image into sketch image. We both have never done image edit before we find it this project is really interesting how other programs such as Adobe Photoshop can be a powerful image-editing software.
+The idea of this project is use racket to perform a convert an image into sketch. We both have never done image edit before we find it this project is really interesting how other programs such as Adobe Photoshop can be a powerful image-editing software.
 
 ### Analysis
 
-A digital image is a contributed by millions pixel/dot. Each pixel is a color, and each color is the mixed of red green and blue (RGB). Our program is read the entire pixel from an image into a list (we can think of 2-dimension array or matrix x/y). Each value in the matrix is represent for a pixel value of the image. By that, we can change the color to anything we want and for this project, our goal it convert the image to stretch image.
+A digital image is a contributed of millions pixel/dot. Each pixel is a color, and each color is mixed of red green and blue (RGB) color. Our program will read the entire pixel from an image and store all the value RGB into a single list (we can also imagine of 2-dimension array or matrix x/y). Each value in the matrix is represent a pixel of the image. By that, we can change the color value (RGB) to anything we want to make a new picture and for this project, our goal it convert the image to stretch image.
+
 Our team try to use less the library of the racket, we implement new function base on the follow Architecture Diagram:
 
 <p align="center"><img src="https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Diagram.png" /></p>
 
-For this project, we have two different programs do to the same thing. Why? Because after we finished the first one, the runtime is too slow for convert so we rewrite the whole thing with differents algoritms so the running time is improved.
+For this project, we have two different programs do to the same thing. Why? Because after we finished the first one, the runtime is so slow to convert an image so we decided to write a new program with differents algoritms to improve the running time.
 
 ### Library
 
@@ -33,7 +34,7 @@ For this project, we have two different programs do to the same thing. Why? Beca
 #### For the second algorithm (Algoirthm-2), we use:
 
 ```racket
-;; This library is use for do the gaussian blur
+;; This library is use to read the RGB and do the gaussian blur
 (require images/flomap)
 (require (except-in racket/draw make-pen make-color))
 ```
@@ -47,7 +48,7 @@ We successfully to convert from the image to sketch.
 
 ### Algorithm 1:
 
-* Read pixels from image and store to RGBList
+* Read pixels from image and store into RGBList
 
 ```racket
 ;; function get pixel at x and y
@@ -220,7 +221,7 @@ We successfully to convert from the image to sketch.
 
 ### Algorithm 2:
 
-* The steps is pretty much the same as the algorithm 1, but the way we read and store RGB is totaly different.
+* The steps and calculation is pretty much same as the first algorithm, but the way we read and store RGB is totaly different.
 
 * We read and store the RGB value into 24bits binary. By doing this, it save a lot memory and also decrease the reading time from the list.
 
@@ -238,12 +239,12 @@ We successfully to convert from the image to sketch.
   (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
 ```
 
-This is how we stored the RGB into 24 bits binary, which using bitwise and shift to the correct position in binary bits.
+This is how we stored the RGB into 24 bits binary, which using bitwise and with xFF and then shift it to the correct position in 24 bits binary.
 
 <p align="center"><img src="https://github.com/oplS17projects/Image-To-Cartoon/blob/master/24bits.JPG" /></p>
 
-* Storing to list:
-	- By storing into a single list, the running time it O(n) to read and store.
+* Store data
+	- By storing into a single list, the running time is O(n).
 
 ```racket
 ;; This function read red/green/blue from PixelsList, then convert it to 24bits binays
@@ -258,15 +259,19 @@ This is how we stored the RGB into 24 bits binary, which using bitwise and shift
 (define RGBmap
   (RGBmap-iter '() PixelsList))
 ```
-* So after we stored to the 24 bits binary, the list of pixels now is only a single list. It helps read faster than the algoirthm 1 which is list inside a list. Example of 24 bits binary for RGB in the list: `'(16777215 16777215 16777215 8026746 6842472.....)`
+* So after we stored to the 24 bits binary, the list of pixels now is only a single list. It helps read faster than the algoirthm 1 which is list inside a list (2D List). Example of 24 bits binary for RGB in the list: `'(16777215 16777215 16777215 8026746 6842472.....)`
 
 
 ## Running Time:
 
 * The running time to convert a 1024x629 image to sketch is:
 - Algorithm 1: 56 seconds.
-- Algorithm 2: 9 seconds.
-  
+- Algorithm 2: 10 seconds.
+
+* Time Complexity
+- Algorithm 1: **O(n^2)** - Quadratic
+- Algorithm 2: **O(n)** - Linear
+
 ## Image:
 Steps:
 ![alt text][steps]
@@ -333,7 +338,7 @@ Main: Gather information needed for the project.
 
 <!-- Links -->
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
-[sketch]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sketch.png
+[sketch]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Architecture.png
 [posterized]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Posterized.png
 [24bits]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/24bits.JPG
 [steps]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/ConvertSteps.png
