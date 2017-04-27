@@ -86,7 +86,9 @@ So, this is how I store 3 RGB values into a 24 bits integer.
 ```racket
 ;; this function store r/g/b to 24bits memory by using bitwise or/and with shift operators
 (define (join-value red green blue)
-  (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
+  (bitwise-ior (bitwise-and red #xFF) 
+				(arithmetic-shift (bitwise-and green #xFF) 8) 
+				(arithmetic-shift (bitwise-and blue #xFF) 16)))
 ```
 
 The interesting of this is I don't have to store each 3 values RGB separately and by convert to one single number, the length of the list is much more shorter and also it help me easy to troubleshoot the program.
