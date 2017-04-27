@@ -274,7 +274,7 @@ This is how we stored the RGB into 24 bits binary, which using bitwise and with 
 
 ## Image:
 Steps:
-![alt text][steps]
+![alt text][sketch]
 
 Input:
 ![alt text][input]
