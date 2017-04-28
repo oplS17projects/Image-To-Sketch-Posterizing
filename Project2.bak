@@ -90,9 +90,6 @@ imginput
 ;; ============================
 ;; This function read red/green/blue from PixelsList, then convert it to 24bits binays
 ;; then return a single list of 24bits integer
-
-;; recursive interative process
-;; time complexity for RGBmap-iter is O(N)
 (define (RGBmap-iter result lst)
   (if (null? lst)
       result
@@ -100,8 +97,6 @@ imginput
        (cons (join-value (get-r lst) (get-g lst) (get-b lst)) result)
        (remain-lst lst))))
 
-;; space complexity is O(N/4)
-;; It make a new list which the size of N/4 because joining 4 values ARGB into 1 value
 (define RGBmap
   (RGBmap-iter '() PixelsList))
 
@@ -130,13 +125,6 @@ imginput
 ;; ===============================
 ;; Invert Colors from Gray Scale
 
-;; recursive interative process
-;; time complexity for invert-color is O(N)
-(define (invert-color result lst)
-  (if (null? lst)
-      result
-      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
-
 (define (get-invert-value num)
   (local
     [(define red (bitwise-bit-field num 0 8))
@@ -144,7 +132,11 @@ imginput
      (define blue (bitwise-bit-field num 16 24))]
     (join-value (- 255 red) (- 255 green) (- 255 blue))))
 
-;; do the inverted
+(define (invert-color result lst)
+  (if (null? lst)
+      result
+      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
+
 (define inverts-value
   (invert-color '() gray-scale))
 
@@ -196,8 +188,6 @@ imginput
     [(define rgb1 (extract-rgb num1))
      (define rgb2 (extract-rgb num2))]
     (value-return rgb1 rgb2)))
-
-
 
 (define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
   (if (null? blurlist)

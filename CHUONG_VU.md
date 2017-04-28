@@ -22,7 +22,7 @@ The code uses four libraries:
 
 # Key Code Excerpts
 
-The key of this is storing data (RGB) as 24 bits binarys into a single list. So, it save the memory and improve the reading time out of memory. Also, by using recursion to loop through the list that I have learned in UMass Lowell's COMP.3010 OPL class. I optimized the running time of the program to O(n) 
+The key of this is storing data (RGB) as 24 bits binarys into a single list. So, it save the memory and improve the reading time out of memory. Also, by using recursion to loop through the list that I have learned in UMass Lowell's COMP.3010 OPL class. I optimized the running time of the program to O(N).
 
 
 Five examples are shown and they are individually numbered. 
@@ -48,7 +48,7 @@ Five examples are shown and they are individually numbered.
  
 ## 2. Convert to single list which each value in the list is represented for a pixel in 24 bits binary
 
-By using the recursion function. I read RGB in the PixelsList. Passed it to join-value function which is used to convert to a 24 bits integer.
+By using the recursion function. I read RGB in the PixelsList. Passed it to join-value function which is used to convert to a 24 bits binary. I used the recursive interative process method that I learned from OPL class. This method take O(N) time to read 4 elements at time, convert and store it back to single list which take the space complexity is O(N/4).
 
 ```racket
 ;; This function read red/green/blue from PixelsList, then convert it to 24bits binays
@@ -63,7 +63,6 @@ By using the recursion function. I read RGB in the PixelsList. Passed it to join
 (define RGBmap
   (RGBmap-iter '() PixelsList))
 ```
-
 
 ## 3. Convert to 24 bits binary from RGB
 

@@ -20,6 +20,20 @@ Our team try to use less the library of the racket, we implement new function ba
 
 For this project, we have two different programs do to the same thing. Why? Because after we finished the first one, the runtime is so slow to convert an image so we decided to write a new program with differents algoritms to improve the running time.
 
+We also used several method that we learned from OPL class to handle the running time.
+
++ Data Structure: We need to store each pixels in the list, but how we store it?
+	- Algorithm-1: Data stored as 2D list of matrix and each pixels is another list of RGB ``(((1 158 51) (2 159 52) (0 157 52) (1 159 54)...``. This take more space in memory and cause more time to read/write to the list (Need two ``for loop`` to read each pixel). In the views of computer architecture and operating system, this will take time in I/O which mean it will keep jump back and forth in the memory to access to the correct address of data. However, by store the values into a 2D list, it helps easy to read the code and follow the pixels if the image output is not same as we expect. But the running time is really slow.
+	
+	- Algoirthm-2: Data stored as single list. All value (Alpha, Red, Green, Blue) is store as a number. So it need only one ``for loop`` and in the memory, it don't have to jump back and forth so the runtime will be linear time which mean O(N) to read/write.
+	
++ Read/Store Data: As we mentioned in the data structure part, we store data in two differents way so that the algoirthm we use to read/store data also is differents in both.
+	- Algoirthm-1: Mostly we used two ``for/list`` and ``list-ref`` which is the built-in functions in Racket to loop through each elements in the data. But this is not what we really learned from class, this is more like in C/C++ or other language than Racket. So, by perform 2 ``for/list``, the runtime really slow.
+	
+	- Algoirthm-2: Mostly we used the recursive interative process method that we learned from OPL class. This method take O(N) time to read 4 elements at time, convert and store it back to single list which take the space complexity is O(N/4). The runtime and space is reduced alot compare to the first algoirthm that we did.
+	
+
+
 ### Library
 
 #### For the first algorithm (Algoirthm-1), we use:
@@ -41,7 +55,7 @@ For this project, we have two different programs do to the same thing. Why? Beca
 
 
 ### Deliverable and Demonstration
-We successfully to convert from the image to sketch.
+We successfully to convert from the image to sketch. For now, every picture need to be in the same folder of the program. However, in the future, we may make an user interface to help user easy to use and also make the read and save image anywhere as the user wants.
 
 
 ## Functional Detail
@@ -259,7 +273,7 @@ This is how we stored the RGB into 24 bits binary, which using bitwise and with 
 (define RGBmap
   (RGBmap-iter '() PixelsList))
 ```
-* So after we stored to the 24 bits binary, the list of pixels now is only a single list. It helps read faster than the algoirthm 1 which is list inside a list (2D List). Example of 24 bits binary for RGB in the list: `'(16777215 16777215 16777215 8026746 6842472.....)`
+* So after we stored to the 24 bits binary, the list of pixels now is only a single list. It helps read faster than the algoirthm 1 which is list inside a list (2D List). Example of 24 bits binary for RGB in the list: `'(16777215 16777215 16777215 8026746 6842472.....)`. Space complexity now will be O(N/4).
 
 
 ## Running Time:
@@ -321,18 +335,19 @@ Main: Clean up, QA for program
 - [x] Read RGB into 2D list 
 - [x] Merge the data from 2D list into single List
 - [x] Merge gray and filter to 2D list
-- [x] Work on filter
+- [x] Work on filters
 - [x] Work on Inverted/Blur image (new algorithm)
-- [x] Work on color-dodge-blend (new algorithm)
+- [x] Work on extra filter (new algorithm)
 - [x] Addressed all bugs before demonstrate.
 
 ### Chuong Vu @vdc1703
 Main: Gather information needed for the project.
 - [x] Convert and store the changeable RGB into 2D list
 - [x] Calculate gray values into new 2D list
-- [x] Work on filter
+- [x] Work on filters
 - [x] Convert new 2D list to a new image
 - [x] Read/extract pixels in 24 bits binary (new algorithm)
+- [x] Work on color-dodge-blend (new algorithm)
 - [x] Convert result to image
 - [x] Clean up the code, ready to demonstrate
 
