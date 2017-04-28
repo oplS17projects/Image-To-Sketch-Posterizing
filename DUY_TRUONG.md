@@ -106,7 +106,17 @@ When we compare with the algorithm 1.
 The algorithm 1 will make more time to run because it using 2 for/list. we need to store it 2 time to create list in list.
 
 
-## 3.
+## 3. Initialization using a Global Object
 
+* Disscusion: For the algorithm 1, I define a global variable. That can help me to avoid to re-call the function multible time and it is easy to check and apply the data to new filter.
+
+* Code:
+
+```
+(define InvertColorList (InvertColor GrayList))
+
+
+(define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
+```
 
 
