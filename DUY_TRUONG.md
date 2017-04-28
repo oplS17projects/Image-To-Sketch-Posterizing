@@ -69,24 +69,29 @@ Five examples are shown and they are individually numbered.
 When we compare the algorithm 1 (using 2D-list) and algorithm 2 (1 list). Because in the algorithm 2 we only have one list, so we can skip this step. It reduce the running time a lot.
 
 
-## 2. Invert Color for gray sacle using recursive process, cons and Procedural Abstraction.
+## 2. Color for gray sacle using recursive process, cons and Procedural Abstraction.
 
-* Input and Output: It will get one number (24bit number of RGB) and return one number 24bits of invert gray scale.
+* Input and Output: It will get one number (24bit number of RGB) and return one number 24bits of gray scale.
 
 * Code:
 
 ```
-(define (invert-color result lst)
-(if (null? lst)
-    result
-    (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
-	
-(define (get-invert-value num)
+(define (get-gray-value num)
   (local
     [(define red (bitwise-bit-field num 0 8))
      (define green (bitwise-bit-field num 8 16))
-     (define blue (bitwise-bit-field num 16 24))]
-    (join-value (- 255 red) (- 255 green) (- 255 blue))))
+     (define blue (bitwise-bit-field num 16 24))
+     (define value (quotient (+ red green blue) 3))]
+    (join-value value value value)))
+
+
+(define (gray-scale-helper result lst )
+  (if (null? lst)
+      result
+      (gray-scale-helper (cons (get-gray-value (car lst)) result) (cdr lst))))
+
+(define gray-scale
+  (gray-scale-helper '() RGBmap))
 ```
 
 * Discussion: for this code, I use the Procedural Abstraction ```null?``` to check the list is empty or not. After that I applied the recursive process concept which I learned in OPL class. For the result, I used cons to add new element to the list.
@@ -94,13 +99,15 @@ When we compare the algorithm 1 (using 2D-list) and algorithm 2 (1 list). Becaus
 When we compare with the algorithm 1.
 
 ```
-(define (Invert-Value lst)
-  (list (- 255 (list-ref lst 0)) (- 255 (list-ref lst 1)) (- 255(list-ref lst 2))))
-  
-(define (MakeInvert invertlist width height)
+(define (gray-point-value lst)
+  (local
+    [(define gray (quotient (+ (list-ref lst 0) (list-ref lst 1) (list-ref lst 2)) 3))]
+    (list gray gray gray)))
+
+(define (GrayList-iter-value data width height)
   (for/list ([x (in-range 0 height)])
     (for/list ([y (in-range 0 width)])
-      (Invert-Value (list-ref (list-ref invertlist x) y))
+      (gray-point-value (list-ref (list-ref data x) y))
       )))
 ```
 The algorithm 1 will make more time to run because it using 2 for/list. we need to store it 2 time to create list in list.
@@ -168,4 +175,6 @@ define (round-num num-ori num-int)
     
     ))
 ```
+## 4. 
+
 
