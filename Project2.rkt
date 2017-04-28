@@ -199,11 +199,10 @@ imginput
 
 (define (Color-Dodge-Blend-Merge BlurList GrayList)
   (define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
-  (if (null? blurlist)
-      result
-      (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
-                                    (cdr blurlist) (cdr bwlist))))
-
+    (if (null? bwlist)
+        result
+        (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
+                                      (cdr blurlist) (cdr bwlist))))
   (Color-Dodge-Blend-Merge-iter '() (reverse BlurList) GrayList))
 
 ;; ===============================
