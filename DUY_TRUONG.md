@@ -175,7 +175,7 @@ define (round-num num-ori num-int)
     
     ))
 ```
-## 4. Extract RGB value from 24 bits number using car and cdr
+## 4. Extract RGB value from 24 bits number and using car and cdr to get the value of RGB
 
 * Discussion: For this function I used the knowledge about car and cdr which I learned in OPL class to implement this function. We get 24 bits number and convert to format (255 red green blue). and Using this one to edit the value.
 
