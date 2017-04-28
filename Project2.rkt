@@ -145,17 +145,6 @@ imginput
 (define inverts-value
   (map (lambda (num) (get-invert-value num)) (reverse gray-scale)))
 
-;;(define (invert-color result lst)
-;;  (if (null? lst)
-;;      result
-;;      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
-
-;; do the inverted
-;;(define inverts-value
-;;  (invert-color '() gray-scale))
-
-
-
 ;; ==============================
 ;; Apply Gaussian Blur to Inverted Color
 ;; By using the flomap library, apply the built-in function flomap-gaussian-blur
@@ -188,6 +177,8 @@ imginput
 ;; if numblur == 255 return numblur
 ;; else return (numbw * 256) / (255 - numblur)
 
+;; Using Tail Recursion for O(N) performance
+
 (define (colordodge numblur numbw)
   (if (equal? 255 numblur)
       numblur
@@ -195,9 +186,9 @@ imginput
 
 (define (value-return blist glist)
   (join-value (colordodge (get-r blist) (get-r glist))
-        (colordodge (get-g blist) (get-g glist))
-        (colordodge (get-b blist) (get-b glist))
-        ))
+              (colordodge (get-g blist) (get-g glist))
+              (colordodge (get-b blist) (get-b glist))
+              ))
 
 (define (return-dodge num1 num2)
   (local
@@ -205,14 +196,15 @@ imginput
      (define rgb2 (extract-rgb num2))]
     (value-return rgb1 rgb2)))
 
-(define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
+
+(define (Color-Dodge-Blend-Merge BlurList GrayList)
+  (define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
   (if (null? blurlist)
       result
       (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
                                     (cdr blurlist) (cdr bwlist))))
 
-(define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
+  (Color-Dodge-Blend-Merge-iter '() (reverse BlurList) GrayList))
 
 ;; ===============================
 ;; Poterized image
@@ -228,7 +220,7 @@ imginput
 ;; function convert back to bitmap (image)
 
 (define finallist
-  (back-to-argb Color-Dodge-Blend-Merge))
+  (back-to-argb (Color-Dodge-Blend-Merge BlurValue gray-scale)))
 
 (send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
 (send imginput save-file (string-append "Sketch_" img-name) 'png)

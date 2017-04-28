@@ -47,7 +47,7 @@ The ``imginput`` bitmap% object will be use through all the code. It is a object
  The pixels list itself after get-argb-pixels, the value will be something like ``#"\377\276\255\235\377\276\255\...``. So it is necessary to convert it to list as ``'(255 190 173 157 255 190 173 157 255 190...)`` which is store as (A R G B A R G B A R G B...) so this will be easy for read out the value to calcuate.
 
 
-## 2. Recursive Interative Process
+## 2. Recursive Interative Process Pixels List
 
 By using the recursion function. I read RGB in the PixelsList. Passed it to join-value function which is used to convert to a 24 bits binary. I used the recursive interative process method that I learned from OPL class. This method take O(N) time to read 4 elements at time, convert and store it back to single list which take the space complexity is O(N/4).
 
@@ -98,7 +98,7 @@ The interesting of this is I don't have to store each 3 values RGB separately an
 
 The invert color will be use for Gaussian Blur method later on. For some people it sound really hard but this is just simply take each value in the list, extract the red/green/blue by using the bitwise-bit-field, subtract each value from 255 and then recombine back to 24bits integer by using ``join-value`` function. 
 
-I used ``map`` to loop through each value in the list and passing value to ``lambda`` then return a inverted value.
+I used ``map`` to loop through each value in the list and passing value to ``lambda`` then return an inverted value.
 
 ```racket
 ;; Invert Colors from Gray Scale
@@ -114,9 +114,7 @@ I used ``map`` to loop through each value in the list and passing value to ``lam
 ```
 
 
-
-
-## 5. Color Dodge Blend Mege
+## 5. Tail Recursion Merge Two Images
 
 Last step before convert all pixel back to bitmap%. The color dodge is use to combine the blur and gray-scale together to make a sketch image.
 
@@ -127,7 +125,7 @@ if blur_value == 255 return blur_value
 else return (gray-scale_value * 256) / (255 - blur_value)
 ```
 
-and this applied to each red, green, and blue color. Then recombine them by join-value functions as above. At this point, all the values in the new list Color-Dodge-Blend-Merge will be convert to bitmap% and it is sketch image. Final result.
+and this applied to each red, green, and blue color. Then recombine them by join-value functions as above. At this point, all the values in the new list Color-Dodge-Blend-Merge will be convert to bitmap% and it is sketch image. I use Tail Recursion to make sure the running time is O(N) based on the length of the GrayList.
 
 ```racket
 (define (colordodge numblur numbw)
@@ -137,9 +135,9 @@ and this applied to each red, green, and blue color. Then recombine them by join
 
 (define (value-return blist glist)
   (join-value (colordodge (get-r blist) (get-r glist))
-        (colordodge (get-g blist) (get-g glist))
-        (colordodge (get-b blist) (get-b glist))
-        ))
+              (colordodge (get-g blist) (get-g glist))
+              (colordodge (get-b blist) (get-b glist))
+              ))
 
 (define (return-dodge num1 num2)
   (local
@@ -147,12 +145,20 @@ and this applied to each red, green, and blue color. Then recombine them by join
      (define rgb2 (extract-rgb num2))]
     (value-return rgb1 rgb2)))
 
-(define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
-  (if (null? blurlist)
-      result
-      (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
-                                    (cdr blurlist) (cdr bwlist))))
 
-(define Color-Dodge-Blend-Merge
-  (Color-Dodge-Blend-Merge-iter '() (reverse BlurValue) gray-scale))
+(define (Color-Dodge-Blend-Merge BlurList GrayList)
+  (define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
+    (if (null? bwlist)
+        result
+        (Color-Dodge-Blend-Merge-iter (cons (return-dodge (car blurlist) (car bwlist)) result)
+                                      (cdr blurlist) (cdr bwlist))))
+  (Color-Dodge-Blend-Merge-iter '() (reverse BlurList) GrayList))
+
+```
+
+This use to call the Color-Dodge-Blend-Merge function and convert it back to argb which is ready for display final result.
+
+```racket
+(define finallist
+  (back-to-argb (Color-Dodge-Blend-Merge BlurValue gray-scale)))
 ```
