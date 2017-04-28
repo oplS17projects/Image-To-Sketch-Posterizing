@@ -118,5 +118,54 @@ The algorithm 1 will make more time to run because it using 2 for/list. we need 
 
 (define BWimage (color-list->bitmap (join-list InvertColorList 0 (length InvertColorList) null) img-width img-height))
 ```
+## 3. Calculating Posterizing Point by using Conditional
 
+* Discustion: This function will calculate the new pixel base on the numOfArea and numOfValues and posterizing value. If the posterizing value is low it will reduce the color of the picture. For example if your posterizing and is 2. The output of the face picture will be the face is black and the backround is white. I tried to look up function can help me to rounding number but I could not find it. So I wrote round-num function. For example 2.5 -> 3 and 2.4 -> 2. I use if and cond a lot for this function. I also use the ```local``` to create new variable only use inside the function.
+
+* Code:
+```
+define (round-num num-ori num-int)
+  (if (< (- num-ori num-int) 0.5)
+      (floor num-ori)
+      (ceiling num-ori)))
+
+(define (posterize-point lst numOfArea numOfValues)
+  (local
+    [(define redAreaFloat (/ (list-ref lst 0) numOfArea))
+     (define redArea (round-num redAreaFloat (floor redAreaFloat)))
+     (define greenAreaFloat (/ (list-ref lst 1) numOfArea))
+     (define greenArea (round-num greenAreaFloat (floor greenAreaFloat)))
+     (define blueAreaFloat (/ (list-ref lst 2) numOfArea))
+     (define blueArea (round-num blueAreaFloat (floor blueAreaFloat)))
+     (define newredfloat 0.0)
+     (define newgreengfloat 0.0)
+     (define newbluefloat 0.0)
+     (define newred 0)
+     (define newgreen 0)
+     (define newblue 0)]
+    
+    (cond
+      [(> redArea redAreaFloat)(set! redArea (- redArea 1))])
+    (set! newredfloat (* numOfValues redArea))
+    (set! newred (round-num newredfloat (floor newredfloat)))
+    (cond
+      [(> newred newredfloat)(set! newred (- newred 1))])
+	  
+    (cond
+      [(> greenArea greenAreaFloat)(set! greenArea (- greenArea 1))])
+    (set! newgreengfloat (* numOfValues greenArea))
+    (set! newgreen (round-num newgreengfloat (floor newgreengfloat)))
+    (cond
+      [(> newgreen newgreengfloat)(set! newgreen (- newgreen 1))])
+    
+    (cond
+      [(> blueArea blueAreaFloat)(set! blueArea (- blueArea 1))])
+    (set! newbluefloat (* numOfValues blueArea))
+    (set! newblue (round-num newbluefloat (floor newbluefloat)))
+    (cond
+      [(> newblue newbluefloat)(set! newblue (- newblue 1))])
+    (list newred newgreen newblue)
+    
+    ))
+```
 
