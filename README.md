@@ -250,7 +250,10 @@ We successfully to convert from the image to sketch. For now, every picture need
 
 ;; this function store r/g/b to 24bits memory by using bitwise or/and with shift operators
 (define (join-value red green blue)
-  (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
+  (let* ([redvalue (bitwise-and red #xFF)]
+         [greenvalue (arithmetic-shift (bitwise-and green #xFF) 8)]
+         [bluevalue (arithmetic-shift (bitwise-and blue #xFF) 16)])
+    (bitwise-ior redvalue greenvalue bluevalue)))
 ```
 
 This is how we stored the RGB into 24 bits binary, which using bitwise and with xFF and then shift it to the correct position in 24 bits binary.

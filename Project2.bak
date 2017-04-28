@@ -36,10 +36,7 @@
 
 ;; this function store r/g/b to 24bits memory by using bitwise or/and with shift operators
 (define (join-value red green blue)
-  (let* ([redvalue (bitwise-and red #xFF)]
-         [greenvalue (arithmetic-shift (bitwise-and green #xFF) 8)]
-         [bluevalue (arithmetic-shift (bitwise-and blue #xFF) 16)])
-    (bitwise-ior redvalue greenvalue bluevalue)))
+  (bitwise-ior (bitwise-and red #xFF) (arithmetic-shift (bitwise-and green #xFF) 8) (arithmetic-shift (bitwise-and blue #xFF) 16)))
 
 ;; Function convert back to ARGB list from list of 24bits values
 (define (back-to-argb-iter result lst)
@@ -114,47 +111,42 @@ imginput
 ;; extract r/g/b, then return value = (r + g + b) / 3
 ;; then use join-value to convert back to 24 bits binary
 (define (get-gray-value num)
-  (let*
-    [(red (bitwise-bit-field num 0 8))
-     (green (bitwise-bit-field num 8 16))
-     (blue (bitwise-bit-field num 16 24))
-     (value (quotient (+ red green blue) 3))]
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))
+     (define value (quotient (+ red green blue) 3))]
     (join-value value value value)))
+
 
 (define (gray-scale-helper result lst )
   (if (null? lst)
-     result
-     (gray-scale-helper (cons (get-gray-value (car lst)) result) (cdr lst))))
+      result
+      (gray-scale-helper (cons (get-gray-value (car lst)) result) (cdr lst))))
 
 (define gray-scale
   (gray-scale-helper '() RGBmap))
-
 
 ;; ===============================
 ;; Invert Colors from Gray Scale
 
 ;; recursive interative process
 ;; time complexity for invert-color is O(N)
+(define (invert-color result lst)
+  (if (null? lst)
+      result
+      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
+
 (define (get-invert-value num)
-  (let*
-    [(red (bitwise-bit-field num 0 8))
-     (green (bitwise-bit-field num 8 16))
-     (blue (bitwise-bit-field num 16 24))]
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))]
     (join-value (- 255 red) (- 255 green) (- 255 blue))))
 
-(define inverts-value
-  (map (lambda (num) (get-invert-value num)) (reverse gray-scale)))
-
-;;(define (invert-color result lst)
-;;  (if (null? lst)
-;;      result
-;;      (invert-color (cons (get-invert-value (car lst)) result) (cdr lst))))
-
 ;; do the inverted
-;;(define inverts-value
-;;  (invert-color '() gray-scale))
-
-
+(define inverts-value
+  (invert-color '() gray-scale))
 
 ;; ==============================
 ;; Apply Gaussian Blur to Inverted Color
@@ -205,6 +197,8 @@ imginput
      (define rgb2 (extract-rgb num2))]
     (value-return rgb1 rgb2)))
 
+
+
 (define (Color-Dodge-Blend-Merge-iter result blurlist bwlist)
   (if (null? blurlist)
       result
@@ -231,7 +225,7 @@ imginput
   (back-to-argb Color-Dodge-Blend-Merge))
 
 (send imginput set-argb-pixels 0 0 img-width img-height (list->bytes (append* finallist)))
-(send imginput save-file (string-append "Sketch_" img-name) 'png)
+(send imginput save-file "Sketch.png" 'png)
 
 (display "Output\n ")
 imginput
