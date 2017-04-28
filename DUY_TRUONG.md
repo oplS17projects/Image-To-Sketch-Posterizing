@@ -175,6 +175,25 @@ define (round-num num-ori num-int)
     
     ))
 ```
-## 4. 
+## 4. Extract RGB value from 24 bits number using car and cdr
 
+* Discussion: For this function I used the knowledge about car and cdr which I learned in OPL class to implement this function. We get 24 bits number and convert to format (255 red green blue). and Using this one to edit the value.
+
+
+* Code:
+
+```
+(define (get-r lst) (cadr lst))
+(define (get-g lst) (caddr lst))
+(define (get-b lst) (cadddr lst))
+(define (remain-lst lst) (cddddr lst))
+
+;; function extract number to red/green/blue value from binary
+(define (extract-rgb num)
+  (local
+    [(define red (bitwise-bit-field num 0 8))
+     (define green (bitwise-bit-field num 8 16))
+     (define blue (bitwise-bit-field num 16 24))]
+    (list 255 red green blue)))
+```
 
