@@ -196,4 +196,4 @@ define (round-num num-ori num-int)
      (define blue (bitwise-bit-field num 16 24))]
     (list 255 red green blue)))
 ```
-
+* The idea using define get-r, get-g and get-b which come from the homework 7 when we implement uml::for function
