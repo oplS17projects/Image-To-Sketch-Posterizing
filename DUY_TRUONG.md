@@ -66,7 +66,7 @@ Five examples are shown and they are individually numbered.
 
 * Disscusion: To join the list, First time I try to use the recursive process and append. when I run it take too much time. So I try to use the append* which have in the racket library, the running time is shorter. Final I choose to use the append* for project to reduce the running time.
 
-When we compare the algorithm 1 (using 2D-list) and algorithm 2 (1 list). Because in the algorithm 2 we only have one list, so we can skip this step. It reduce the running time a lot.
+* When we compare the algorithm 1 (using 2D-list) and algorithm 2 (1 list). Because in the algorithm 2 we only have one list, so we can skip this step. It reduce the running time a lot.
 
 
 ## 2. Color for gray sacle using recursive process, cons and Procedural Abstraction.
