@@ -41,7 +41,7 @@ For the algorithm 2:
 
 The key of this project is storing pixel data and edit the data. Our team have 2 algorithm to store the data. I store the data by using list and 2-D list my partner find the way to store it into 24bit number. I used some knowledge which I have learned in UMass Lowell's COMP.3010 OPL class to applied to this project. 
 
-Five examples are shown and they are individually numbered.
+Four examples are shown and they are individually numbered.
 
 ## 1. Joining the 2-D list become 1 list Using  recursive process and append.
 
