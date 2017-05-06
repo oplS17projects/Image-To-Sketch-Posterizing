@@ -356,7 +356,7 @@ Main: Gather information needed for the project.
 
 <!-- Links -->
 [input]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/house.jpg
-[sketch]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Architecture.png
+[sketch]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Sketch_house.jpg
 [posterized]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/Posterized.png
 [24bits]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/24bits.JPG
 [steps]: https://github.com/oplS17projects/Image-To-Cartoon/blob/master/ConvertSteps.png
